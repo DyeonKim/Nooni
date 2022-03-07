@@ -29,7 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
-            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintDimensionRatio="3:4"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_cameraF_title"
@@ -44,20 +44,22 @@
             android:layout_marginTop="8dp"
             android:text="촬영하려면 화면을 두 번 눌러주세요"
             android:textColor="@color/nooni"
-            android:textSize="16sp"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_cameraF_res"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/previewView_cameraF"
-            app:layout_constraintBottom_toTopOf="@+id/tv_cameraF_res"/>
+            app:layout_constraintTop_toBottomOf="@+id/previewView_cameraF" />
 
         <TextView
             android:id="@+id/tv_cameraF_res"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
             android:layout_marginTop="16dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center_horizontal"
             android:text="(삼양) 짱구"
             android:textColor="@color/black"
-            android:textSize="40sp"
+            android:textSize="50sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_cameraF_description" />
