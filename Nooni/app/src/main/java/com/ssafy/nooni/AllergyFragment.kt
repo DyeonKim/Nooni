@@ -7,11 +7,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
+import com.ssafy.nooni.util.SharedPrefArrayListUtil
 
 
 class AllergyFragment : Fragment() {
     lateinit var binding: FragmentAllergyBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
+    var sharePrefArrayListUtil = SharedPrefArrayListUtil()
+    var allergyList: ArrayList<String>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +38,8 @@ class AllergyFragment : Fragment() {
             return@setOnTouchListener gestureDetector.onTouchEvent(event)
         }
 
+        allergyList = sharePrefArrayListUtil.getStringArrayPref(requireContext(), "allergies")
+
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.llAllergyF.setOnClickListener{}
 
@@ -51,7 +56,12 @@ class AllergyFragment : Fragment() {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
+
+        if(allergyList?.size ?: 0 == 0){
+            allergyRVAdapter.setData(listOf("없음"))
+        } else {
+            allergyList?.let { allergyRVAdapter.setData(it) }
+        }
     }
 
     inner class MyGesture: GestureDetector.OnGestureListener {
