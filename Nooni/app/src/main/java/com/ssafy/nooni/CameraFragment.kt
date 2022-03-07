@@ -18,6 +18,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.BottomSheetRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import java.lang.Exception
@@ -152,7 +153,38 @@ class CameraFragment : Fragment() {
 
         override fun onLongPress(p0: MotionEvent?) {}
 
-        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
+        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+            val SWIPE_THRESHOLD = 100
+            val SWIPE_VELOCITY_THRESHOLD = 10
+
+            var result = false
+            try {
+                val diffY = p1!!.y - p0!!.y
+                val diffX = p1!!.x - p0!!.x
+                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(p3) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        onSwipeBottom()
+                    } else {
+                        onSwipeTop()
+                    }
+                    result = true
+                }
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+
+            return result }
+
+        private val behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
+        private fun onSwipeBottom() {
+            Toast.makeText(requireContext(), "아래로 스와이프", Toast.LENGTH_SHORT).show()
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        private fun onSwipeTop() {
+            Toast.makeText(requireContext(), "위로 스와이프", Toast.LENGTH_SHORT).show()
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
     }
 
