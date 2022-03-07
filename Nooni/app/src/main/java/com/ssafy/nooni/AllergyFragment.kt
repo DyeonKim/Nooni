@@ -1,5 +1,6 @@
 package com.ssafy.nooni
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -84,7 +85,7 @@ class AllergyFragment : Fragment() {
         override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            // TODO : 알레르기 등록 액티비티로 이동
+            startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
             return true
         }
 
