@@ -177,12 +177,10 @@ class CameraFragment : Fragment() {
 
         private val behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
         private fun onSwipeBottom() {
-            Toast.makeText(requireContext(), "아래로 스와이프", Toast.LENGTH_SHORT).show()
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
 
         private fun onSwipeTop() {
-            Toast.makeText(requireContext(), "위로 스와이프", Toast.LENGTH_SHORT).show()
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
 
