@@ -1,59 +1,153 @@
 package com.ssafy.nooni
 
+import android.content.ContentValues
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
+import com.ssafy.nooni.databinding.FragmentCameraBinding
+import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CameraFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+private const val TAG = "CameraFragment"
 class CameraFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    lateinit var binding: FragmentCameraBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera, container, false)
+        binding = FragmentCameraBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CameraFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CameraFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
+    }
+
+    private fun init() {
+        var gestureListener = MyGesture()
+        var doubleTapListener = MyDoubleGesture()
+        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        gestureDetector.setOnDoubleTapListener(doubleTapListener)
+        binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        }
+
+        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
+        binding.constraintLayoutCameraF.setOnClickListener{}
+
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        startCamera()
+    }
+
+    private var imageCapture: ImageCapture? = null
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
+
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            //Preview
+            val preview = Preview.Builder()
+                .build()
+                .also {
+                    it.setSurfaceProvider(binding.previewViewCameraF.surfaceProvider)
+                }
+
+            imageCapture = ImageCapture.Builder()
+                .build()
+
+            //후면 카메라 기본으로 세팅
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                // 카메라와 라이프사이클 바인딩 전 모든 바인딩 해제
+                cameraProvider.unbindAll()
+
+                // 카메라와 라이프사이클 바인딩
+                cameraProvider.bindToLifecycle(requireActivity(), cameraSelector, preview, imageCapture)
+            } catch (e: Exception) {
+                Log.d(TAG, "Use case binding failed: ", e)
+            }
+        }, ContextCompat.getMainExecutor(requireActivity()))
+    }
+
+    fun takePicture() {
+        val imageCapture = this.imageCapture?: return
+
+        //MediaStore에 저장할 파일 이름 생성
+        val name = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.KOREA).format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.ImageColumns.DISPLAY_NAME, "nooni$name.jpg")
+            put(MediaStore.Images.ImageColumns.TITLE, "nooni$name.jpg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
+            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/nooni")
+            }
+        }
+
+        // 파일과 메타데이터를 포함하는 아웃풋 옵션 설정
+        val outputOptions = ImageCapture.OutputFileOptions
+            .Builder(requireActivity().contentResolver, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            .build()
+
+        //캡처 리스너 세팅, 이벤트 발생하면 위에서 지정한 경로로 이미지 저장
+        imageCapture.takePicture(
+            outputOptions, ContextCompat.getMainExecutor(requireActivity()), object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    Toast.makeText(requireContext(), "이미지가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.d(TAG, "onCaptureSavedError: ${exception.message}")
                 }
             }
+        )
     }
+
+    inner class MyGesture: GestureDetector.OnGestureListener {
+        override fun onDown(p0: MotionEvent?): Boolean { return false }
+
+        override fun onShowPress(p0: MotionEvent?) {}
+
+        override fun onSingleTapUp(p0: MotionEvent?): Boolean { return false }
+
+        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
+
+        override fun onLongPress(p0: MotionEvent?) {}
+
+        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
+
+    }
+
+    inner class MyDoubleGesture: GestureDetector.OnDoubleTapListener {
+        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
+
+        override fun onDoubleTap(p0: MotionEvent?): Boolean {
+            takePicture()
+            return true
+        }
+
+        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
+    }
+
 }
+
