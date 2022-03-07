@@ -1,59 +1,85 @@
 package com.ssafy.nooni
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.nooni.adapter.AllergyRVAdapter
+import com.ssafy.nooni.databinding.FragmentAllergyBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AllergyFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class AllergyFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    lateinit var binding: FragmentAllergyBinding
+    lateinit var allergyRVAdapter: AllergyRVAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_allergy, container, false)
+        binding = FragmentAllergyBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment AllergyFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            AllergyFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        init()
     }
+
+    private fun init(){
+        var gestureListener = MyGesture()
+        var doubleTapListener = MyDoubleGesture()
+        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        gestureDetector.setOnDoubleTapListener(doubleTapListener)
+        binding.llAllergyF.setOnTouchListener { v, event ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        }
+
+        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
+        binding.llAllergyF.setOnClickListener{}
+
+        setRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    private fun setRecyclerView() {
+        allergyRVAdapter = AllergyRVAdapter()
+        binding.rvAllergyFAllergy.apply{
+            adapter = allergyRVAdapter
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+        }
+        allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
+    }
+
+    inner class MyGesture: GestureDetector.OnGestureListener {
+        override fun onDown(p0: MotionEvent?): Boolean { return false }
+
+        override fun onShowPress(p0: MotionEvent?) {}
+
+        override fun onSingleTapUp(p0: MotionEvent?): Boolean { return false }
+
+        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
+
+        override fun onLongPress(p0: MotionEvent?) {}
+
+        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
+
+
+    }
+
+    inner class MyDoubleGesture: GestureDetector.OnDoubleTapListener {
+        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
+
+        override fun onDoubleTap(p0: MotionEvent?): Boolean {
+            // TODO : 알레르기 등록 액티비티로 이동
+            return true
+        }
+
+        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
+    }
+
+
 }
