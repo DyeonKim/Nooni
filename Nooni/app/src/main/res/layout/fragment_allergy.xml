@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".AllergyFragment">
 
     <TextView
         android:id="@+id/tv_title_allergy"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="62dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/title_back"
+        android:gravity="center"
         android:text="알레르기"
         android:textAlignment="center"
-        android:textColor="@color/nooni"
+        android:textColor="@color/white"
         android:textSize="34sp" />
 
-</FrameLayout>
+    
+
+</LinearLayout>
