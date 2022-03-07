@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Nooni">
         <activity
+            android:name=".RegisterAllergyActivity"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
