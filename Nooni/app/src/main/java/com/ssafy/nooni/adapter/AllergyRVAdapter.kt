@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.R
 
-class BottomSheetRVAdapter: RecyclerView.Adapter<BottomSheetRVAdapter.ViewHolder>() {
+class AllergyRVAdapter: RecyclerView.Adapter<AllergyRVAdapter.ViewHolder>() {
     private var data = listOf<String>()
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -17,7 +17,7 @@ class BottomSheetRVAdapter: RecyclerView.Adapter<BottomSheetRVAdapter.ViewHolder
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BottomSheetRVAdapter.ViewHolder{
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllergyRVAdapter.ViewHolder{
         val view = LayoutInflater.from(parent.context).inflate(R.layout.list_allergy_item, parent, false)
         return ViewHolder(view)
     }
