@@ -1,6 +1,7 @@
 package com.ssafy.nooni
 
 import android.content.ContentValues
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -15,6 +16,9 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.nooni.adapter.BottomSheetRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -23,6 +27,7 @@ import java.util.*
 private const val TAG = "CameraFragment"
 class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
+    lateinit var bottomSheetRVAdapter: BottomSheetRVAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +54,9 @@ class CameraFragment : Fragment() {
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.constraintLayoutCameraF.setOnClickListener{}
 
+        // TODO : Room에서 알레르기 데이터 불러와서 bottomSheet 초기화
+
+        setBottomSheetRecyclerView()
 
     }
 
@@ -123,6 +131,16 @@ class CameraFragment : Fragment() {
         )
     }
 
+    private fun setBottomSheetRecyclerView() {
+        bottomSheetRVAdapter = BottomSheetRVAdapter()
+        binding.rvCameraFBsAllergy.apply{
+            adapter = bottomSheetRVAdapter
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+//            addItemDecoration(RecyclerViewDecoration(10))
+        }
+        bottomSheetRVAdapter.setData(listOf("밀", "우유", "콩"))
+    }
+
     inner class MyGesture: GestureDetector.OnGestureListener {
         override fun onDown(p0: MotionEvent?): Boolean { return false }
 
@@ -148,6 +166,5 @@ class CameraFragment : Fragment() {
 
         override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
     }
-
 }
 
