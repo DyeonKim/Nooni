@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
     private fun checkPermissions() {
         if(!permissionUtil.checkPermissions(listOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA,))) {
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_CONTACTS))) {
             permissionUtil.requestPermissions()
         } else {
             init()
