@@ -3,6 +3,6 @@
     <item
         android:drawable="@drawable/img_btn_yes"
         android:height="200dp"
-        android:width="200dp"/>
+        android:width="180dp"/>
     
 </layer-list>
