@@ -14,16 +14,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.nooni.adapter.ContactsRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
 import com.ssafy.nooni.databinding.FragmentContactBinding
+import com.ssafy.nooni.db.ContactDatabase
+import com.ssafy.nooni.db.ContactViewModel
 import com.ssafy.nooni.entity.Contact
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val TAG = "ContactFragment"
 class ContactFragment : Fragment() {
-    lateinit var binding: FragmentContactBinding
+    private lateinit var binding: FragmentContactBinding
     private lateinit var contentResolver: ContentResolver
-    var contact: Contact = Contact("", "", 0, 0)
+    private lateinit var contactsRVAdapter: ContactsRVAdapter
     private lateinit var getResult: ActivityResultLauncher<Intent>
+    private val model: ContactViewModel by activityViewModels()
+
+    private var contactsList = mutableListOf<Contact>()
+    var contact: Contact = Contact("", "", 0, 0)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,9 +51,34 @@ class ContactFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+        setRecyclerView()
     }
 
     private fun init(){
+        contactsRVAdapter = ContactsRVAdapter(requireContext())
+
+         model.getAll().observe(requireActivity(), Observer {
+             contactsRVAdapter.setData(it)
+             contactsRVAdapter.notifyDataSetChanged()
+         })
+
+        addContact()
+        setRecyclerView()
+    }
+
+    private fun setRecyclerView() {
+
+        binding.rvContactFContact.apply {
+            adapter = contactsRVAdapter
+            layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
+        }
+
+        if(contactsList.isNotEmpty()) {
+            contactsRVAdapter.setData(contactsList)
+        }
+    }
+
+    private fun addContact(){
         
         getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(it.resultCode == RESULT_OK){
@@ -59,6 +99,9 @@ class ContactFragment : Fragment() {
                 cursor.close()
 
                 Log.d(TAG, "init: phone = ${contact.name}")
+                lifecycleScope.launch(Dispatchers.IO){
+                    model.insert(contact)
+                }
             }
         }
         
@@ -69,7 +112,4 @@ class ContactFragment : Fragment() {
         }
 
     }
-
-
-
 }
