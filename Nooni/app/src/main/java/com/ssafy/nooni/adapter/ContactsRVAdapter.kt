@@ -27,12 +27,30 @@ import android.content.Context
 import com.ssafy.nooni.R
 
 
-class ContactsRVAdapter(context: Context) :
-    RecyclerView.Adapter<ContactsRVAdapter.ViewHolder>() {
+class ContactsRVAdapter(context: Context) : RecyclerView.Adapter<ContactsRVAdapter.ViewHolder>() {
+    lateinit var itemClickListener: ItemClickListener
+    lateinit var itemLongClickListener: ItemLongClickListener
+
     private var list = ArrayList<Contact>()
     private val mContext: Context = context
 
     inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        init {
+            itemView.setOnClickListener {
+                if(this@ContactsRVAdapter::itemClickListener.isInitialized) {
+                    itemClickListener.onClick(list[adapterPosition])
+                }
+            }
+
+            itemView.setOnLongClickListener {
+                if(this@ContactsRVAdapter::itemLongClickListener.isInitialized) {
+                    itemLongClickListener.onClick(list[adapterPosition])
+                }
+                true
+            }
+        }
+
+
         private val text = itemView.findViewById<TextView>(R.id.tv_contactItem_name)
         private val picture = itemView.findViewById<CircleImageView>(R.id.imageView_contactItem_picture)
         fun bind(item: Contact){
@@ -113,6 +131,14 @@ class ContactsRVAdapter(context: Context) :
         }
         rBitmap = Bitmap.createScaledBitmap(oBitmap, width.toInt(), height.toInt(), true)
         return rBitmap
+    }
+
+    interface ItemClickListener {
+        fun onClick(contact: Contact)
+    }
+
+    interface  ItemLongClickListener {
+        fun onClick(contact: Contact)
     }
 
 
