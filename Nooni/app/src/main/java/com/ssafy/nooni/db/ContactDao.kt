@@ -1,5 +1,6 @@
 package com.ssafy.nooni.db
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.ssafy.nooni.entity.Contact
 
@@ -15,7 +16,7 @@ interface ContactDao {
     fun delete(contact: Contact)
 
     @Query("SELECT * FROM Contact")
-    fun getAll(): List<Contact>
+    fun getAll(): LiveData<List<Contact>>
 
     @Query("DELETE FROM Contact WHERE id = :id")
     fun deleteContactById(id: Int)
