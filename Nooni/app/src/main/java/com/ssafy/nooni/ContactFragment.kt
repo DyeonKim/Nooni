@@ -25,6 +25,7 @@ import com.ssafy.nooni.databinding.FragmentContactBinding
 import com.ssafy.nooni.db.ContactDatabase
 import com.ssafy.nooni.db.ContactViewModel
 import com.ssafy.nooni.entity.Contact
+import com.ssafy.nooni.ui.SelectDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,10 +77,22 @@ class ContactFragment : Fragment() {
         if(contactsList.isNotEmpty()) {
             contactsRVAdapter.setData(contactsList)
         }
+
+        contactsRVAdapter.itemClickListener = object: ContactsRVAdapter.ItemClickListener {
+            override fun onClick(contact: Contact) {
+                TODO("Not yet implemented")
+            }
+        }
+
+        contactsRVAdapter.itemLongClickListener = object: ContactsRVAdapter.ItemLongClickListener {
+                override fun onClick(contact: Contact) {
+                    showSelectDialog(contact)
+                }
+            }
+
     }
 
     private fun addContact(){
-        
         getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(it.resultCode == RESULT_OK){
                 contentResolver = requireActivity().contentResolver
@@ -110,6 +123,16 @@ class ContactFragment : Fragment() {
             intent.data = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
             getResult.launch(intent)
         }
+    }
 
+    private fun showSelectDialog(contact: Contact){
+        SelectDialog(requireContext())
+            .setContent("해당 연락처를\n삭제하시겠습니까?")
+            .setPositiveButtonText("삭제")
+            .setOnPositiveClickListener{
+                lifecycleScope.launch(Dispatchers.IO) {
+                    model.delete(contact)
+                }
+            }.build().show()
     }
 }
