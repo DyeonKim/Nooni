@@ -1,9 +1,10 @@
 package com.ssafy.nooni.entity
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity
+@Entity(indices = [Index(value = ["person_id"], unique = true)])
 data class Contact (
     var name: String,
     var phone: String,

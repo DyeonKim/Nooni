@@ -2,16 +2,20 @@ package com.ssafy.nooni
 
 import android.app.Activity.RESULT_OK
 import android.content.ContentResolver
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.net.Uri
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.ContactsContract
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
@@ -20,13 +24,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.adapter.ContactsRVAdapter
-import com.ssafy.nooni.databinding.FragmentAllergyBinding
 import com.ssafy.nooni.databinding.FragmentContactBinding
-import com.ssafy.nooni.db.ContactDatabase
 import com.ssafy.nooni.db.ContactViewModel
 import com.ssafy.nooni.entity.Contact
 import com.ssafy.nooni.ui.SelectDialog
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,9 +38,15 @@ class ContactFragment : Fragment() {
     private lateinit var contactsRVAdapter: ContactsRVAdapter
     private lateinit var getResult: ActivityResultLauncher<Intent>
     private val model: ContactViewModel by activityViewModels()
+    private lateinit var mainActivity: MainActivity
 
     private var contactsList = mutableListOf<Contact>()
     var contact: Contact = Contact("", "", 0, 0)
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -113,7 +120,14 @@ class ContactFragment : Fragment() {
 
                 Log.d(TAG, "init: phone = ${contact.name}")
                 lifecycleScope.launch(Dispatchers.IO){
-                    model.insert(contact)
+                    try {
+                        model.insert(contact)
+                    }catch (e: SQLiteConstraintException){
+                        val handler = Handler(Looper.getMainLooper())
+                        handler.postDelayed(Runnable{
+                            Toast.makeText(mainActivity, "이미 등록되어있는 연락처입니다.", Toast.LENGTH_SHORT).show()
+                        }, 0)
+                    }
                 }
             }
         }
