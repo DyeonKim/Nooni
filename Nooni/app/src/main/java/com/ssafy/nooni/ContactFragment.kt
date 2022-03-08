@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.database.sqlite.SQLiteConstraintException
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
+import android.telephony.PhoneNumberUtils
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -87,7 +89,10 @@ class ContactFragment : Fragment() {
 
         contactsRVAdapter.itemClickListener = object: ContactsRVAdapter.ItemClickListener {
             override fun onClick(contact: Contact) {
-                TODO("Not yet implemented")
+                val i = Intent(Intent.ACTION_DIAL)
+                i.data = Uri.parse("tel:${contact.phone}")
+//                i.putExtra("videocall", true) // 인텐트를 Intent.ACTION_CALL로 주고 요 엑스트라를 넣으면 영상통화가 걸려야 되는데 일반 전화로 걸림..
+                startActivity(i)
             }
         }
 
