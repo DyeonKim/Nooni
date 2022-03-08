@@ -109,6 +109,13 @@
                 android:textColor="@color/black"
                 android:textSize="34sp" />
 
+            <View
+                android:layout_width="300dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center_horizontal"
+                android:layerType="software"
+                android:background="@drawable/dotted_line" />
+
             <TextView
                 android:id="@+id/tv_cameraF_bs_price"
                 android:layout_width="match_parent"
@@ -118,6 +125,13 @@
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="34sp" />
+
+            <View
+                android:layout_width="300dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center_horizontal"
+                android:layerType="software"
+                android:background="@drawable/dotted_line" />
 
             <TextView
                 android:id="@+id/tv_cameraF_bs_allergy"
@@ -132,7 +146,17 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_cameraF_bs_allergy"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <View
+                android:layout_width="300dp"
+                android:layout_height="3dp"
+                android:layout_gravity="center_horizontal"
+                android:layerType="software"
+                android:background="@drawable/dotted_line" />
 
             <TextView
                 android:id="@+id/tv_cameraF_bs_calorie"
