@@ -23,7 +23,8 @@
         android:id="@+id/rv_contactF_contact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="3"/>
+        android:layout_gravity="center"
+        android:layout_weight="3" />
 
     <ImageButton
         android:id="@+id/imageButton_contactF_add"
