@@ -1,12 +1,14 @@
 package com.ssafy.nooni
 
 import android.content.ContentValues
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.camera.core.CameraSelector
@@ -28,6 +30,12 @@ private const val TAG = "CameraFragment"
 class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
+    private lateinit var mainActivity: MainActivity
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,12 +65,12 @@ class CameraFragment : Fragment() {
         // TODO : Room에서 알레르기 데이터 불러와서 bottomSheet 초기화
 
         setBottomSheetRecyclerView()
-
     }
 
     override fun onResume() {
         super.onResume()
         startCamera()
+        mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
     }
 
     private var imageCapture: ImageCapture? = null

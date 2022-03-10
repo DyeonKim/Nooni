@@ -8,17 +8,6 @@
     android:weightSum="3"
     tools:context=".ContactFragment">
 
-    <TextView
-        android:id="@+id/tv_title_contact"
-        android:layout_width="match_parent"
-        android:layout_height="62dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/title_back"
-        android:gravity="center"
-        android:text="번호 등록"
-        android:textColor="@color/white"
-        android:textSize="34sp" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_contactF_contact"
         android:layout_width="match_parent"

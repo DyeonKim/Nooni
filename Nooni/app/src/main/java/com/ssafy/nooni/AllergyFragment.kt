@@ -1,8 +1,10 @@
 package com.ssafy.nooni
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +18,12 @@ class AllergyFragment : Fragment() {
     lateinit var allergyRVAdapter: AllergyRVAdapter
     var sharePrefArrayListUtil = SharedPrefArrayListUtil()
     var allergyList: ArrayList<String>? = null
+    private lateinit var mainActivity: MainActivity
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mainActivity = context as MainActivity
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,6 +57,7 @@ class AllergyFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
     }
 
     private fun setRecyclerView() {
