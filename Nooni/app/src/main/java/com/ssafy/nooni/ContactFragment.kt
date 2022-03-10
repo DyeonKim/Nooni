@@ -32,6 +32,7 @@ import com.ssafy.nooni.entity.Contact
 import com.ssafy.nooni.ui.SelectDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 private const val TAG = "ContactFragment"
 class ContactFragment : Fragment() {
@@ -94,10 +95,10 @@ class ContactFragment : Fragment() {
         }
 
         contactsRVAdapter.itemLongClickListener = object: ContactsRVAdapter.ItemLongClickListener {
-                override fun onClick(contact: Contact) {
-                    showDeleteDialog(contact)
-                }
+            override fun onClick(contact: Contact) {
+                showDeleteDialog(contact)
             }
+        }
     }
 
     private fun moveDial(contact: Contact) {
@@ -164,7 +165,11 @@ class ContactFragment : Fragment() {
             .setPositiveButtonText("삭제")
             .setOnPositiveClickListener{
                 lifecycleScope.launch(Dispatchers.IO) {
-                    model.delete(contact)
+                    try {
+                        model.delete(contact)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "showDeleteDialog: ERROR = ${e.message}")
+                    }
                 }
             }.build().show()
     }
