@@ -28,10 +28,11 @@
 
     <ImageButton
         android:id="@+id/imageButton_contactF_add"
-        android:layout_width="180dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="20dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/img_btn_add"/>
+        android:background="@drawable/add"/>
 
 
 </LinearLayout>

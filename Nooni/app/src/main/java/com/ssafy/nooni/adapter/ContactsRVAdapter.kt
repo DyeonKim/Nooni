@@ -57,7 +57,7 @@ class ContactsRVAdapter(context: Context) : RecyclerView.Adapter<ContactsRVAdapt
             text.text = item.name
 
             picture.setImageDrawable(
-                mContext.resources.getDrawable(R.drawable.ic_baseline_person_24)
+                mContext.resources.getDrawable(R.drawable.profile)
             )
             val profile =
                 loadContactPhoto(mContext.contentResolver, item.person_id, item.photo_id)

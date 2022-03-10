@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout_cameraF"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tv_cameraF_title"
@@ -31,11 +31,11 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_cameraF_description"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_cameraF_title"
-            app:layout_constraintBottom_toTopOf="@+id/tv_cameraF_description">
+            app:layout_constraintTop_toBottomOf="@+id/tv_cameraF_title">
 
         </androidx.camera.view.PreviewView>
 
