@@ -108,6 +108,7 @@ class ContactFragment : Fragment() {
     }
 
     private fun addContact(){
+        val handler = Handler(Looper.getMainLooper())
         getResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if(it.resultCode == RESULT_OK){
                 contentResolver = requireActivity().contentResolver
@@ -130,8 +131,10 @@ class ContactFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO){
                     try {
                         model.insert(contact)
+                        handler.postDelayed(Runnable{
+                            Toast.makeText(mainActivity, "연락처 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                        }, 0)
                     }catch (e: SQLiteConstraintException){
-                        val handler = Handler(Looper.getMainLooper())
                         handler.postDelayed(Runnable{
                             Toast.makeText(mainActivity, "이미 등록되어있는 연락처입니다.", Toast.LENGTH_SHORT).show()
                         }, 0)
