@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:drawable="@drawable/img_btn_no"
-        android:height="180dp"
-        android:width="160dp"/>
+        android:drawable="@drawable/no1"
+        android:height="120dp"
+        android:width="120dp"/>
 
 </layer-list>
