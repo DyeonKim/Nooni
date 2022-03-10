@@ -89,19 +89,22 @@ class ContactFragment : Fragment() {
 
         contactsRVAdapter.itemClickListener = object: ContactsRVAdapter.ItemClickListener {
             override fun onClick(contact: Contact) {
-                val i = Intent(Intent.ACTION_DIAL)
-                i.data = Uri.parse("tel:${contact.phone}")
-//                i.putExtra("videocall", true) // 인텐트를 Intent.ACTION_CALL로 주고 요 엑스트라를 넣으면 영상통화가 걸려야 되는데 일반 전화로 걸림..
-                startActivity(i)
+                showSelectDialog(contact)
             }
         }
 
         contactsRVAdapter.itemLongClickListener = object: ContactsRVAdapter.ItemLongClickListener {
                 override fun onClick(contact: Contact) {
-                    showSelectDialog(contact)
+                    showDeleteDialog(contact)
                 }
             }
+    }
 
+    private fun moveDial(contact: Contact) {
+        val intent = Intent(Intent.ACTION_DIAL)
+        intent.data = Uri.parse("tel:${contact.phone}")
+//        intent.putExtra("videocall", true) // 인텐트를 Intent.ACTION_CALL로 주고 요 엑스트라를 넣으면 영상통화가 걸려야 되는데 일반 전화로 걸림..
+        startActivity(intent)
     }
 
     private fun addContact(){
@@ -145,6 +148,14 @@ class ContactFragment : Fragment() {
     }
 
     private fun showSelectDialog(contact: Contact){
+        SelectDialog(requireContext())
+            .setContent("다이얼 화면으로\n이동하시겠습니까?")
+            .setOnPositiveClickListener{
+                moveDial(contact)
+            }.build().show()
+    }
+
+    private fun showDeleteDialog(contact: Contact){
         SelectDialog(requireContext())
             .setContent("해당 연락처를\n삭제하시겠습니까?")
             .setPositiveButtonText("삭제")
