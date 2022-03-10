@@ -160,6 +160,7 @@ class ContactFragment : Fragment() {
     }
 
     private fun showDeleteDialog(contact: Contact){
+        val handler = Handler(Looper.getMainLooper())
         SelectDialog(requireContext())
             .setContent("해당 연락처를\n삭제하시겠습니까?")
             .setPositiveButtonText("삭제")
@@ -167,6 +168,9 @@ class ContactFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         model.delete(contact)
+                        handler.postDelayed(Runnable{
+                            Toast.makeText(mainActivity, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                        }, 0)
                     } catch (e: Exception) {
                         Log.e(TAG, "showDeleteDialog: ERROR = ${e.message}")
                     }
