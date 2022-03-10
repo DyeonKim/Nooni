@@ -3,6 +3,7 @@ package com.ssafy.nooni
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
 
@@ -42,6 +43,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     private fun save(){
         sharePrefArrayListUtil.setStringArrayPref(this, "allergies", allergyList)
+        Toast.makeText(this, "알레르기 정보 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
         finish()
     }
 }
