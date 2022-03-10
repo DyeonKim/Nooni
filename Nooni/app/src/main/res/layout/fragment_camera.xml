@@ -39,6 +39,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="70dp"
             android:autoSizeTextType="uniform"
+            android:autoSizeMaxTextSize="50sp"
             android:gravity="center_horizontal"
             android:text="(삼양) 짱구"
             android:layout_weight="4"

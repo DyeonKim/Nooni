@@ -16,6 +16,7 @@
         android:text="어쩌구저쩌구"
         android:textColor="@color/black"
         android:autoSizeTextType="uniform"
+        android:autoSizeMaxTextSize="40sp"
         android:textSize="34sp" />
 
     <LinearLayout
