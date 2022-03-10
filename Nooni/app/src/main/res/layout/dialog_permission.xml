@@ -16,7 +16,7 @@
         android:gravity="center_horizontal|center_vertical"
         android:text="어쩌구저쩌구"
         android:textColor="@color/black"
-        android:textSize="24sp" />
+        android:textSize="34sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
             android:layout_weight="1"
             android:text="취소"
             android:textColor="@color/nooni"
-            android:textSize="24sp" />
+            android:textSize="34sp" />
 
         <TextView
             android:id="@+id/tv_permissionDialog_pos"
@@ -49,6 +49,6 @@
             android:gravity="end"
             android:text="확인"
             android:textColor="@color/nooni"
-            android:textSize="24sp" />
+            android:textSize="34sp" />
     </LinearLayout>
 </LinearLayout>
