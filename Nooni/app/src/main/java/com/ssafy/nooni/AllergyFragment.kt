@@ -67,7 +67,7 @@ class AllergyFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
 
-        if(allergyList?.size ?: 0 == 0){
+        if(allergyList?.isEmpty() == true){
             allergyRVAdapter.setData(listOf("없음"))
         } else {
             allergyList?.let { allergyRVAdapter.setData(it) }
