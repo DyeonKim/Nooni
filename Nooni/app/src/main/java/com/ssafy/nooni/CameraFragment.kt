@@ -62,8 +62,6 @@ class CameraFragment : Fragment() {
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.constraintLayoutCameraF.setOnClickListener{}
 
-        // TODO : Room에서 알레르기 데이터 불러와서 bottomSheet 초기화
-
         setBottomSheetRecyclerView()
     }
 
