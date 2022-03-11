@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/ll_allergyF"
+    tools:context=".AllergyFragment">
+
+    <TextView
+        android:id="@+id/tv_allergyF_ment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="등록된 알레르기"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="34sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_allergyF_allergy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"/>
+
+    <TextView
+        android:id="@+id/tv_allergyF_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="알레르기 정보를 수정하시려면 화면을 두 번 누르세요"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+
+</LinearLayout>
