@@ -3,6 +3,7 @@ package com.ssafy.nooni
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -58,6 +59,18 @@ class AllergyFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
+
+        var string: String = "알레르기 정보 화면입니다."
+        if(allergyList?.isEmpty() == true){
+            string += "등록된 알레르기가 없습니다."
+        } else {
+            string += "등록된 알레르기는 "
+            for(item in allergyList!!){
+                string += "${item}, "
+            }
+            string += "입니다."
+        }
+        mainActivity.tts.speak(string + "수정하시려면 화면을 두 번 누르세요", TextToSpeech.QUEUE_FLUSH, null)
     }
 
     private fun setRecyclerView() {
@@ -73,6 +86,11 @@ class AllergyFragment : Fragment() {
             allergyList?.let { allergyRVAdapter.setData(it) }
         }
     }
+
+//    override fun onPause() {
+//        super.onPause()
+//        mainActivity.tts.stop()
+//    }
 
     inner class MyGesture: GestureDetector.OnGestureListener {
         override fun onDown(p0: MotionEvent?): Boolean { return false }
