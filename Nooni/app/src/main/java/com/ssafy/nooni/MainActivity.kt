@@ -63,6 +63,15 @@ class MainActivity : AppCompatActivity() {
         }, 1200)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if(tts != null){
+            tts.stop()
+            tts.shutdown()
+        }
+    }
+
     private fun checkPermissions() {
         if(!permissionUtil.checkPermissions(listOf(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,

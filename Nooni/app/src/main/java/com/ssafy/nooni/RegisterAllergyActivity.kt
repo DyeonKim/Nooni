@@ -35,10 +35,10 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
         init()
     }
-
+    
     private fun init() {
         // TODO: 맨 처음 멘트 안나오는거 수정해야함
-        tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null);
+        tts2.speak("나는 갑각류 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null);
         binding.tvAllergyAType.text = list[cnt]
 
 
@@ -47,7 +47,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
             if(++cnt >= list.size) save()
             else {
                 binding.tvAllergyAType.text = list[cnt]
-                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null);
+                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null)
             }
         }
         binding.btnAllergyAYes.setOnClickListener {
@@ -57,7 +57,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
             if(++cnt >= list.size) save()
             else {
                 binding.tvAllergyAType.text = list[cnt]
-                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null);
+                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null)
             }
         }
 
@@ -68,5 +68,14 @@ class RegisterAllergyActivity : AppCompatActivity() {
         Toast.makeText(this, "알레르기 정보 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
         tts2.speak("알레르기 정보 등록이 완료되었습니다.", TextToSpeech.QUEUE_FLUSH, null)
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if(tts2 != null){
+            tts2.stop()
+            tts2.shutdown()
+        }
     }
 }
