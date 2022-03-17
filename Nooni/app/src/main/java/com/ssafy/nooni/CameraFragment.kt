@@ -6,6 +6,8 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -31,6 +33,7 @@ class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+//    private lateinit var tts: TextToSpeech
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -51,6 +54,16 @@ class CameraFragment : Fragment() {
     }
 
     private fun init() {
+//        tts = TextToSpeech(requireContext(), TextToSpeech.OnInitListener {
+//            @Override
+//            fun onInit(status: Int){
+//                if(status != ERROR)  {
+//                    tts.language = Locale.KOREA
+//                }
+//            }
+//        })
+//        mainActivity.tts.speak(binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null);
+
         var gestureListener = MyGesture()
         var doubleTapListener = MyDoubleGesture()
         var gestureDetector = GestureDetector(requireContext(), gestureListener)
@@ -69,6 +82,7 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
+        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
     }
 
     private var imageCapture: ImageCapture? = null
