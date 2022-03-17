@@ -2,6 +2,8 @@ package com.ssafy.nooni
 
 import android.content.ContentValues
 import android.content.Context
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -23,6 +25,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import java.lang.Exception
+import java.net.URLDecoder
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,7 +35,8 @@ class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
-
+    private lateinit var mediaPlayer: MediaPlayer
+    val url = URLEncoder.encode( "https://storage.googleapis.com/nooni-a587a.appspot.com/results/vocgan_콘초 입니다 .wav","UTF-8")
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -48,6 +53,25 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+
+        binding.button5.setOnClickListener {
+              start()
+        }
+    }
+    private fun start(){
+        try{
+            if(mediaPlayer!=null){
+                mediaPlayer.stop()
+            }
+            mediaPlayer = MediaPlayer()
+            mediaPlayer.setDataSource(URLDecoder.decode(url,"UTF-8"))
+            mediaPlayer.prepare()
+            mediaPlayer.start()
+            Toast.makeText(requireContext(),"ttt",Toast.LENGTH_SHORT)
+        }
+        catch (e:Exception){
+            Log.d(TAG, "start: 11111111")
+        }
     }
 
     private fun init() {
