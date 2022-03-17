@@ -2,6 +2,7 @@ package com.ssafy.nooni.config
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import com.kakao.sdk.common.KakaoSdk
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -18,6 +19,7 @@ class ApplicationClass:Application() {
     override fun onCreate() {
         super.onCreate()
         initRetrofit()
+        KakaoSdk.init(this, "c09ab9ab21d2c70cd982b6dd34ff6126")
     }
     fun initRetrofit() {
         val client: OkHttpClient = OkHttpClient.Builder()
