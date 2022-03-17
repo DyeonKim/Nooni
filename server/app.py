@@ -120,7 +120,7 @@ def synthesize(model, vocoder, text, sentence, prefix=''):
     if vocoder is not None:
         if hp.vocoder.lower() == "vocgan":
             utils.vocgan_infer(mel_postnet_torch, vocoder,
-                               path=os.path.join(hp.test_path, '{}_{}.wav'.format(hp.vocoder, sentence)))
+                               path=os.path.join(hp.test_path, '{}_{}.wav'.format(hp.vocoder, sentence.split()[0])))
 
     utils.plot_data([(mel_postnet_torch[0].detach().cpu().numpy(), f0_output, energy_output)],
                     ['Synthesized Spectrogram'],
@@ -147,7 +147,7 @@ def index():
     text = kor_preprocess(sentence)
     synthesize(model, vocoder, text, sentence, prefix='')
     path_to_file = os.path.join(hp.test_path,'{}_{}.wav'.format(hp.vocoder,sentence))
-    fileUpload("results/"+'{}_{}.wav'.format(hp.vocoder,sentence))
-    return "https://storage.googleapis.com/nooni-a587a.appspot.com/results/"+'{}_{}.wav'.format(hp.vocoder,sentence)
+    fileUpload("results/"+'{}_{}.wav'.format(hp.vocoder,sentence.split()[0]))
+    return "https://storage.googleapis.com/nooni-a587a.appspot.com/results/"+'{}_{}.wav'.format(hp.vocoder,sentence.split()[0])
 
 
