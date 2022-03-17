@@ -3,15 +3,16 @@ package com.ssafy.nooni
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
-import org.w3c.dom.Text
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +34,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+//    override fun onResume() {
+//        super.onResume()
+//        init()
+//    }
+
     private fun init() {
         val viewpager: ViewPager2 = binding.viewpager
         val viewpagerFragmentAdapter = ViewpagerFragmentAdapter(this)
@@ -53,6 +59,16 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         checkPermissions()
+    }
+
+    override fun onBackPressed(){
+        tts.speak("누니를 종료합니다.", TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler()
+        handler.postDelayed(Runnable{
+            tts.shutdown()
+            moveTaskToBack(true)
+            finish()
+        }, 1200)
     }
 
     private fun checkPermissions() {
