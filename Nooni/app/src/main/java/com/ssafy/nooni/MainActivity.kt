@@ -3,17 +3,22 @@ package com.ssafy.nooni
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.ERROR
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
+import org.w3c.dom.Text
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
+    lateinit var tts: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +39,15 @@ class MainActivity : AppCompatActivity() {
 
         viewpager.adapter = viewpagerFragmentAdapter
         viewpager.currentItem = 1
+
+        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
+            @Override
+            fun onInit(status: Int){
+                if(status != ERROR){
+                    tts.language = Locale.KOREA
+                }
+            }
+        })
     }
 
     override fun onStart() {
