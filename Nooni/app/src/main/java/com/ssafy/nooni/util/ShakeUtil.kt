@@ -13,7 +13,7 @@ class ShakeUtil : SensorEventListener {
     private var mShakeTimestamp: Long = 0
     private var mShakeCount = 0
 
-    private val SHAKE_THRESHOLD_GRAVITY = 2.7f
+    private val SHAKE_THRESHOLD_GRAVITY = 5.7f
     private val SHAKE_SLOP_TIME_MS = 500
     private val SHAKE_COUNT_RESET_TIME_MS = 3000
 
