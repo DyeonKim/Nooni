@@ -2,6 +2,8 @@ package com.ssafy.nooni
 
 import android.content.ContentValues
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -24,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
+import com.ssafy.nooni.util.ShakeUtil
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +37,10 @@ class CameraFragment : Fragment() {
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
     private lateinit var behavior: BottomSheetBehavior<LinearLayout>
+
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mAccelerometer: Sensor
+    private lateinit var mShakeUtil: ShakeUtil
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -51,6 +58,7 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+        initSensor()
     }
 
     private fun init() {
@@ -81,7 +89,19 @@ class CameraFragment : Fragment() {
         })
 
         setBottomSheetRecyclerView()
+    }
 
+
+    private fun initSensor(){
+        mSensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        mShakeUtil = ShakeUtil()
+        mShakeUtil.setOnShakeListener(object : ShakeUtil.OnShakeListener {
+            override fun onShake(count: Int) {
+                describeTTS()
+            }
+        })
     }
 
 //    override fun onStart() {
@@ -94,8 +114,14 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
         mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
+
+        mSensorManager.registerListener(
+            mShakeUtil,
+            mAccelerometer,
+            SensorManager.SENSOR_DELAY_UI
+        )
     }
 
     private var imageCapture: ImageCapture? = null
@@ -233,6 +259,11 @@ class CameraFragment : Fragment() {
         // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
         var string = "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
         mainActivity.tts.speak(string, TextToSpeech.QUEUE_FLUSH, null)
+    }
+
+    override fun onPause() {
+        mSensorManager.unregisterListener(mShakeUtil)
+        super.onPause()
     }
 
 }
