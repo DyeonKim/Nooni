@@ -33,7 +33,6 @@ class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
-//    private lateinit var tts: TextToSpeech
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,15 +53,6 @@ class CameraFragment : Fragment() {
     }
 
     private fun init() {
-//        tts = TextToSpeech(requireContext(), TextToSpeech.OnInitListener {
-//            @Override
-//            fun onInit(status: Int){
-//                if(status != ERROR)  {
-//                    tts.language = Locale.KOREA
-//                }
-//            }
-//        })
-//        mainActivity.tts.speak(binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null);
 
         var gestureListener = MyGesture()
         var doubleTapListener = MyDoubleGesture()
