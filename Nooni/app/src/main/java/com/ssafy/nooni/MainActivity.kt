@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
-import android.widget.Toast
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
@@ -33,11 +30,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//        init()
-//    }
 
     private fun init() {
         val viewpager: ViewPager2 = binding.viewpager
