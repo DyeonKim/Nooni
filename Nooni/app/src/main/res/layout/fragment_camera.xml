@@ -32,13 +32,6 @@
             android:textColor="@color/nooni"
             android:textSize="24sp" />
 
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:text="Button" />
-
         <TextView
             android:id="@+id/tv_cameraF_res"
             android:layout_width="match_parent"
