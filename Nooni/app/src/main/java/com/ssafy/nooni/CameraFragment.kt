@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -33,6 +33,7 @@ class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -65,13 +66,35 @@ class CameraFragment : Fragment() {
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.constraintLayoutCameraF.setOnClickListener{}
 
+        behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                    describeTTS()
+                } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                    mainActivity.tts.stop()
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+
+        })
+
         setBottomSheetRecyclerView()
+
     }
+
+//    override fun onStart() {
+//        super.onStart()
+//        Toast.makeText(requireActivity(), "camera onStart called", Toast.LENGTH_SHORT).show()
+//        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
+//    }
 
     override fun onResume() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
+        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
         mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
     }
 
@@ -183,7 +206,7 @@ class CameraFragment : Fragment() {
 
             return result }
 
-        private val behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
+
         private fun onSwipeBottom() {
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -204,5 +227,13 @@ class CameraFragment : Fragment() {
 
         override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
     }
+
+
+    private fun describeTTS(){
+        // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
+        var string = "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
+        mainActivity.tts.speak(string, TextToSpeech.QUEUE_FLUSH, null)
+    }
+
 }
 
