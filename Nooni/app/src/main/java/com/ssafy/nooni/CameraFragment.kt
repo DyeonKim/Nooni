@@ -20,17 +20,30 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.kakao.sdk.common.util.Utility
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import com.kakao.sdk.link.LinkClient
+import com.kakao.sdk.link.rx
+import com.kakao.sdk.template.model.Content
+import com.kakao.sdk.template.model.FeedTemplate
+import com.kakao.sdk.template.model.Link
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 
 private const val TAG = "CameraFragment"
 class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+
+    // 공유하기 했을 때 보여줄 이미지 url
+    var imgurl = "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcUxX90%2FbtrlUPkw75S%2FjiiFRmcRByXogjx0ubhWkK%2Fimg.png"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -146,6 +159,32 @@ class CameraFragment : Fragment() {
         allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
     }
 
+    private fun sendKakaoLink(content: String) {
+        val defaultFeed = FeedTemplate(
+            content = Content(
+                title = "Test Title",
+                description = content,
+                imageUrl = imgurl,
+                link = Link(
+                    mobileWebUrl = "https://naver.com"
+                ),
+            )
+        )
+
+        var disposable = CompositeDisposable()
+
+        LinkClient.rx.defaultTemplate(requireContext(), defaultFeed)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ linkResult ->
+                Log.d(TAG, "sendKakaoLink: 카카오링크 보내기 성공 ${linkResult.intent}")
+                startActivity(linkResult.intent)
+            }, { error ->
+                Log.d(TAG, "sendKakaoLink: 카카오링크 보내기 실패 $error")
+            })
+            .addTo(disposable)
+    }
+
     inner class MyGesture: GestureDetector.OnGestureListener {
         override fun onDown(p0: MotionEvent?): Boolean { return false }
 
@@ -201,4 +240,3 @@ class CameraFragment : Fragment() {
         override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
     }
 }
-
