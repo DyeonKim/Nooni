@@ -119,5 +119,8 @@ class AllergyFragment : Fragment() {
         override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
     }
 
-
+    override fun onPause() {
+        super.onPause()
+        mainActivity.tts.stop()
+    }
 }
