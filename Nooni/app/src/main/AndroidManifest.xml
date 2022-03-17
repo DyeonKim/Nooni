@@ -6,8 +6,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".config.ApplicationClass"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -28,7 +30,22 @@
             android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"/>
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- "kakao${YOUR_NATIVE_APP_KEY}://kakaolink" 형식의 앱 실행 스킴을 설정하는데 사용 -->
+                <data android:host="kakaolink"
+                    android:scheme="kakaoc09ab9ab21d2c70cd982b6dd34ff6126" />
+            </intent-filter>
+        </activity>
     </application>
+
+    <queries>
+        <package android:name="com.kakao.talk" />
+    </queries>
 
 </manifest>
