@@ -2,14 +2,18 @@ package com.ssafy.nooni
 
 import android.content.ContentValues
 import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -24,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
+import com.ssafy.nooni.util.ShakeUtil
 import com.ssafy.nooni.util.PlayMediaUtil
 import java.lang.Exception
 import java.net.URLDecoder
@@ -37,7 +42,14 @@ class CameraFragment : Fragment() {
     lateinit var binding: FragmentCameraBinding
     lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
+
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mAccelerometer: Sensor
+    private lateinit var mShakeUtil: ShakeUtil
+
     private val mediaUtil = PlayMediaUtil()
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -54,6 +66,7 @@ class CameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         init()
+        initSensor()
 
         // 아래와 같이 url에서 음성파일 실행할 수 있음
         // TODO: 음성파일 이름 규칙을 만들어야 url 접근이 용이
@@ -70,6 +83,7 @@ class CameraFragment : Fragment() {
 
 
     private fun init() {
+
         var gestureListener = MyGesture()
         var doubleTapListener = MyDoubleGesture()
         var gestureDetector = GestureDetector(requireContext(), gestureListener)
@@ -81,13 +95,54 @@ class CameraFragment : Fragment() {
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.constraintLayoutCameraF.setOnClickListener {}
 
+        behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                    describeTTS()
+                } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                    mainActivity.tts.stop()
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+
+        })
+
         setBottomSheetRecyclerView()
     }
+
+
+    private fun initSensor(){
+        mSensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        mShakeUtil = ShakeUtil()
+        mShakeUtil.setOnShakeListener(object : ShakeUtil.OnShakeListener {
+            override fun onShake(count: Int) {
+                describeTTS()
+            }
+        })
+    }
+
+//    override fun onStart() {
+//        super.onStart()
+//        Toast.makeText(requireActivity(), "camera onStart called", Toast.LENGTH_SHORT).show()
+//        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
+//    }
 
     override fun onResume() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
+//        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
+        mainActivity.ttsSpeak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString())
+
+        mSensorManager.registerListener(
+            mShakeUtil,
+            mAccelerometer,
+            SensorManager.SENSOR_DELAY_UI
+        )
     }
 
     private var imageCapture: ImageCapture? = null
@@ -220,7 +275,7 @@ class CameraFragment : Fragment() {
             return result
         }
 
-        private val behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
+
         private fun onSwipeBottom() {
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -245,5 +300,18 @@ class CameraFragment : Fragment() {
             return false
         }
     }
+
+
+    private fun describeTTS(){
+        // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
+        var string = "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
+        mainActivity.ttsSpeak(string)
+    }
+
+    override fun onPause() {
+        mSensorManager.unregisterListener(mShakeUtil)
+        super.onPause()
+    }
+
 }
 

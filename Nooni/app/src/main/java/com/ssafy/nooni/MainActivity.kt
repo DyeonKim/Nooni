@@ -3,17 +3,20 @@ package com.ssafy.nooni
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
+import android.os.Handler
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.ERROR
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
+    lateinit var tts: TextToSpeech
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +37,47 @@ class MainActivity : AppCompatActivity() {
 
         viewpager.adapter = viewpagerFragmentAdapter
         viewpager.currentItem = 1
+
+        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
+            @Override
+            fun onInit(status: Int){
+                if(status != ERROR){
+                    tts.language = Locale.KOREA
+                }
+            }
+        })
+    }
+
+    fun ttsSpeak(text: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 
     override fun onStart() {
         super.onStart()
         checkPermissions()
+    }
+
+    override fun onBackPressed(){
+        tts.speak("누니를 종료합니다.", TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler()
+        handler.postDelayed(Runnable{
+            tts.shutdown()
+            moveTaskToBack(true)
+            finish()
+        }, 1200)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if(tts != null){
+            tts.stop()
+            tts.shutdown()
+        }
     }
 
     private fun checkPermissions() {

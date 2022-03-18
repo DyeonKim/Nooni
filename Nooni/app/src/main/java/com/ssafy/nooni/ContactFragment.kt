@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
+import android.speech.tts.TextToSpeech
 import android.telephony.PhoneNumberUtils
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -80,6 +81,7 @@ class ContactFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "연락처"
+        mainActivity.ttsSpeak("연락처 화면입니다.")
     }
 
     private fun setRecyclerView() {
@@ -95,12 +97,14 @@ class ContactFragment : Fragment() {
 
         contactsRVAdapter.itemClickListener = object: ContactsRVAdapter.ItemClickListener {
             override fun onClick(contact: Contact) {
+                mainActivity.ttsSpeak(contact.name + " 님에게 전화를 거시겠습니까?")
                 showSelectDialog(contact)
             }
         }
 
         contactsRVAdapter.itemLongClickListener = object: ContactsRVAdapter.ItemLongClickListener {
             override fun onClick(contact: Contact) {
+                mainActivity.ttsSpeak(contact.name + " 님의 연락처를 삭제하시겠습니까?")
                 showDeleteDialog(contact)
             }
         }
@@ -137,10 +141,12 @@ class ContactFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO){
                     try {
                         model.insert(contact)
+                        mainActivity.ttsSpeak("연락처 등록이 완료되었습니다.")
                         handler.postDelayed(Runnable{
                             Toast.makeText(mainActivity, "연락처 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
                         }, 0)
                     }catch (e: SQLiteConstraintException){
+                        mainActivity.ttsSpeak("이미 등록되어있는 연락처 입니다.")
                         handler.postDelayed(Runnable{
                             Toast.makeText(mainActivity, "이미 등록되어있는 연락처입니다.", Toast.LENGTH_SHORT).show()
                         }, 0)
@@ -159,6 +165,9 @@ class ContactFragment : Fragment() {
     private fun showSelectDialog(contact: Contact){
         SelectDialog(requireContext())
             .setContent("다이얼 화면으로\n이동하시겠습니까?")
+            .setOnNegativeClickListener{
+                mainActivity.tts.stop()
+            }
             .setOnPositiveClickListener{
                 moveDial(contact)
             }.build().show()
@@ -168,11 +177,15 @@ class ContactFragment : Fragment() {
         val handler = Handler(Looper.getMainLooper())
         SelectDialog(requireContext())
             .setContent("해당 연락처를\n삭제하시겠습니까?")
+            .setOnNegativeClickListener{
+                mainActivity.tts.stop()
+            }
             .setPositiveButtonText("삭제")
             .setOnPositiveClickListener{
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         model.delete(contact)
+                        mainActivity.ttsSpeak("연락처가 삭제되었습니다.")
                         handler.postDelayed(Runnable{
                             Toast.makeText(mainActivity, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
                         }, 0)
