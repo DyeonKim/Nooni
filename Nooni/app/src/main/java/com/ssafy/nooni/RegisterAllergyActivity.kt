@@ -35,19 +35,26 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
         init()
     }
+
+    private fun ttsSpeak(text: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts2.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts2.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
     
     private fun init() {
         // TODO: 맨 처음 멘트 안나오는거 수정해야함
-        tts2.speak("나는 갑각류 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null);
+        ttsSpeak("나는 갑각류 알레르기가 있다.")
         binding.tvAllergyAType.text = list[cnt]
-
 
         binding.btnAllergyANo.setOnClickListener {
             Log.d(TAG, "init: cnt = $cnt")
             if(++cnt >= list.size) save()
             else {
                 binding.tvAllergyAType.text = list[cnt]
-                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null)
+                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
             }
         }
         binding.btnAllergyAYes.setOnClickListener {
@@ -57,7 +64,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
             if(++cnt >= list.size) save()
             else {
                 binding.tvAllergyAType.text = list[cnt]
-                tts2.speak("나는 " + list[cnt] + " 알레르기가 있다.", TextToSpeech.QUEUE_FLUSH, null)
+                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
             }
         }
 

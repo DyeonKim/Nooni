@@ -48,6 +48,14 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    fun ttsSpeak(text: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         checkPermissions()

@@ -70,7 +70,7 @@ class AllergyFragment : Fragment() {
             }
             string += "입니다."
         }
-        mainActivity.tts.speak(string + "수정하시려면 화면을 두 번 누르세요", TextToSpeech.QUEUE_FLUSH, null)
+        mainActivity.ttsSpeak(string + "수정하시려면 화면을 두 번 누르세요")
     }
 
     private fun setRecyclerView() {
@@ -86,11 +86,6 @@ class AllergyFragment : Fragment() {
             allergyList?.let { allergyRVAdapter.setData(it) }
         }
     }
-
-//    override fun onPause() {
-//        super.onPause()
-//        mainActivity.tts.stop()
-//    }
 
     inner class MyGesture: GestureDetector.OnGestureListener {
         override fun onDown(p0: MotionEvent?): Boolean { return false }

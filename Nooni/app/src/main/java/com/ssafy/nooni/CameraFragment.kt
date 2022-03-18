@@ -78,7 +78,7 @@ class CameraFragment : Fragment() {
 //            "UTF-8"
 //        )
 //        mediaUtil.start(url)
-        
+
     }
 
 
@@ -136,7 +136,7 @@ class CameraFragment : Fragment() {
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
 //        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
-        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
+        mainActivity.ttsSpeak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString())
 
         mSensorManager.registerListener(
             mShakeUtil,
@@ -305,7 +305,7 @@ class CameraFragment : Fragment() {
     private fun describeTTS(){
         // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
         var string = "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
-        mainActivity.tts.speak(string, TextToSpeech.QUEUE_FLUSH, null)
+        mainActivity.ttsSpeak(string)
     }
 
     override fun onPause() {
