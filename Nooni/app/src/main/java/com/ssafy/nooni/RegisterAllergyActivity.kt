@@ -50,24 +50,20 @@ class RegisterAllergyActivity : AppCompatActivity() {
         binding.tvAllergyAType.text = list[cnt]
 
         binding.btnAllergyANo.setOnClickListener {
-            Log.d(TAG, "init: cnt = $cnt")
-            if(++cnt >= list.size) save()
-            else {
-                binding.tvAllergyAType.text = list[cnt]
-                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
-            }
+            allergyNext()
         }
         binding.btnAllergyAYes.setOnClickListener {
             allergyList.add(list[cnt])
-
-            Log.d(TAG, "init: cnt = $cnt")
-            if(++cnt >= list.size) save()
-            else {
-                binding.tvAllergyAType.text = list[cnt]
-                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
-            }
+            allergyNext()
         }
+    }
 
+    private fun allergyNext(){
+        if(++cnt >= list.size) save()
+        else {
+            binding.tvAllergyAType.text = list[cnt]
+            ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
+        }
     }
 
     private fun save(){
