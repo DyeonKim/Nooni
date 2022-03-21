@@ -36,6 +36,12 @@ import com.ssafy.nooni.databinding.FragmentCameraBinding
 import com.ssafy.nooni.ml.Model
 import com.ssafy.nooni.util.ShakeUtil
 import com.ssafy.nooni.util.PlayMediaUtil
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.IOException
@@ -44,6 +50,7 @@ import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.channels.AsynchronousFileChannel.open
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -94,6 +101,8 @@ class CameraFragment : Fragment() {
         "페리오46cm쿨민트치약",
         "카카오프렌즈밴드중형"
     )
+
+    private var dataId = -1
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -316,6 +325,37 @@ class CameraFragment : Fragment() {
         allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
     }
 
+    private fun setProductData() {
+        // JSON 파일 열어서 String으로 취득
+        val assetManager = resources.assets
+        val inputStream = assetManager.open("data.json")
+        val jsonString = inputStream.bufferedReader().use { it.readText() }
+
+        // JSONArray로 파싱
+        val jsonArray = JSONArray(jsonString)
+
+        var bcode = ""
+        for (index in 0 until jsonArray.length()){
+            val jsonObject = jsonArray.getJSONObject(index)
+            val id = jsonObject.getString("id")
+            if(id == dataId.toString()) {
+                bcode = jsonObject.getString("bcode")
+            }
+            Log.d(TAG, "setBottomSheetData: bcode = $bcode")
+        }
+
+        // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
+        CoroutineScope(Dispatchers.IO).launch {
+            val url = "https://www.cvslove.com/product/product_view.asp?pcode=$bcode"
+            val doc = Jsoup.connect(url).timeout(1000*10).get()
+            val contentData: Elements = doc.select("#Table4")
+            var price = ""
+            Log.d(TAG, "setBottomSheetData: $contentData")
+
+        }
+
+    }
+
     private fun classifyImage(image: Bitmap, originImage: Bitmap) {
         try {
             var model: Model = Model.newInstance(requireContext())
@@ -356,6 +396,9 @@ class CameraFragment : Fragment() {
             }
 
             Toast.makeText(context, "${String.format("%s: %.1f%%\n", classes[maxPos], confidences[maxPos] * 100)}", Toast.LENGTH_SHORT).show()
+
+            dataId = maxPos
+            setProductData()
 
             model.close()
         } catch (e: IOException) {
