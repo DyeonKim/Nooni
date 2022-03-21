@@ -23,10 +23,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
-    private val sttViewModel:SttViewModel by viewModels()
-    private lateinit var mRecognizer:SpeechRecognizer
+    private val sttViewModel: SttViewModel by viewModels()
+    private lateinit var mRecognizer: SpeechRecognizer
     lateinit var tts: TextToSpeech
-
+    lateinit var viewpager: ViewPager2
+    lateinit var i:Intent
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -38,24 +39,29 @@ class MainActivity : AppCompatActivity() {
                 init()
             }
         }
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,packageName)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR")
+        STTinit()
 
-        mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-        mRecognizer.setRecognitionListener(sttlistener)
-        mRecognizer.startListening(intent)
-
-        sttViewModel.stt.observe(this){
-            Log.d("tst5", "onCreate:1111 "+sttViewModel.stt.value)
-            val mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-            mRecognizer.setRecognitionListener(sttlistener)
-            mRecognizer.startListening(intent)
+        sttViewModel.stt.observe(this) {
+            Log.d("tst5", "onCreate:1111 " + sttViewModel.stt.value)
+        }
+        sttViewModel.nooni.observe(this) {
+            if (sttViewModel.nooni.value == true) {
+                ttsSpeak("네 말씀해주세요")
+            }
         }
     }
 
+    fun STTinit() {
+        i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
+        mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        mRecognizer.setRecognitionListener(sttlistener)
+        mRecognizer.startListening(i)
+    }
+
     private fun init() {
-        val viewpager: ViewPager2 = binding.viewpager
+        viewpager = binding.viewpager
         val viewpagerFragmentAdapter = ViewpagerFragmentAdapter(this)
 
         viewpager.adapter = viewpagerFragmentAdapter
@@ -63,15 +69,15 @@ class MainActivity : AppCompatActivity() {
 
         tts = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
-            fun onInit(status: Int){
-                if(status != ERROR){
+            fun onInit(status: Int) {
+                if (status != ERROR) {
                     tts.language = Locale.KOREA
                 }
             }
         })
     }
 
-    fun ttsSpeak(text: String){
+    fun ttsSpeak(text: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
@@ -84,10 +90,10 @@ class MainActivity : AppCompatActivity() {
         checkPermissions()
     }
 
-    override fun onBackPressed(){
+    override fun onBackPressed() {
         tts.speak("누니를 종료합니다.", TextToSpeech.QUEUE_FLUSH, null)
         val handler = Handler()
-        handler.postDelayed(Runnable{
+        handler.postDelayed(Runnable {
             tts.shutdown()
             moveTaskToBack(true)
             finish()
@@ -95,11 +101,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if(tts != null){
+        if (tts != null) {
             tts.stop()
             tts.shutdown()
         }
-        if(mRecognizer!=null){
+        if (mRecognizer != null) {
             mRecognizer.destroy()
             mRecognizer.cancel()
         }
@@ -107,16 +113,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        if(!permissionUtil.checkPermissions(listOf(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_CONTACTS,
-                Manifest.permission.CALL_PHONE))) {
+        if (!permissionUtil.checkPermissions(
+                listOf(
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.CALL_PHONE
+                )
+            )
+        ) {
             permissionUtil.requestPermissions()
         } else {
             init()
         }
     }
+
     val sttlistener: RecognitionListener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle) {
             // 말하기 시작할 준비가되면 호출
@@ -154,7 +165,9 @@ class MainActivity : AppCompatActivity() {
                 SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "말하는 시간초과"
                 else -> "알 수 없는 오류임"
             }
+            ttsSpeak("오류가 발생했습니다.")
             Log.d("tst5", "onError: $message")
+
         }
 
         override fun onResults(results: Bundle) {
@@ -167,10 +180,11 @@ class MainActivity : AppCompatActivity() {
                 //textView.setText(matches!![i])
             }
             sttViewModel.setStt(matches)
-            if(resultStr.isEmpty()) return
+            if (resultStr.isEmpty()) return
             resultStr = resultStr.replace(" ", "");
             moveActivity(resultStr);
-            Log.d("tst5", "onError: $matches")
+            Log.d("tst5", "onResult: $matches")
+           mRecognizer.startListening(i)
         }
 
         override fun onPartialResults(partialResults: Bundle) {
@@ -181,10 +195,22 @@ class MainActivity : AppCompatActivity() {
             // 향후 이벤트를 추가하기 위해 예약
         }
     }
-    fun moveActivity(resultString: String){
-        if(resultString.indexOf("알러지")>-1){
-            val intent = Intent(this, RegisterAllergyActivity::class.java)
-            startActivity(intent)
+
+    fun moveActivity(resultString: String) {
+        if (sttViewModel.nooni.value == true) {
+            if (viewpager.currentItem != 1
+                && (resultString.indexOf("카메라") > -1
+                || resultString.indexOf("홈") > -1)
+            ) {
+                viewpager.currentItem = 1
+                sttViewModel.setNooni(false)
+            } else if (viewpager.currentItem != 2 && resultString.indexOf("연락처") > -1) {
+                viewpager.currentItem = 2
+                sttViewModel.setNooni(false)
+            }
+        }
+        if (resultString.indexOf("누니야") > -1 || resultString.indexOf("눈이야") > -1) {
+            sttViewModel.setNooni(true)
         }
     }
 }
