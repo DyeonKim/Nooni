@@ -2,13 +2,13 @@ package com.ssafy.nooni
 
 import android.Manifest
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.Viewmodel.SttViewModel
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
@@ -19,8 +19,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
-    private var sttUtil = SttUtil()
     private val sttViewModel:SttViewModel by viewModels()
+    private lateinit var mRecognizer:SpeechRecognizer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,packageName)
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE,"ko-KR")
 
-        val mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+        mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         mRecognizer.setRecognitionListener(sttlistener)
         mRecognizer.startListening(intent)
 
@@ -116,11 +116,15 @@ class MainActivity : AppCompatActivity() {
             // 인식 결과가 준비되면 호출
             // 말을 하면 ArrayList에 단어를 넣고 textView에 단어를 이어줌
             val matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+            var resultStr = ""
             for (i in 0 until matches!!.size) {
-
+                resultStr += matches[i];
                 //textView.setText(matches!![i])
             }
             sttViewModel.setStt(matches)
+            if(resultStr.isEmpty()) return
+            resultStr = resultStr.replace(" ", "");
+            moveActivity(resultStr);
             Log.d("tst5", "onError: $matches")
         }
 
@@ -131,5 +135,19 @@ class MainActivity : AppCompatActivity() {
         override fun onEvent(eventType: Int, params: Bundle) {
             // 향후 이벤트를 추가하기 위해 예약
         }
+    }
+    fun moveActivity(resultString: String){
+        if(resultString.indexOf("알러지")>-1){
+            val intent = Intent(this, RegisterAllergyActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    override fun onDestroy() {
+        if(mRecognizer!=null){
+            mRecognizer.destroy()
+            mRecognizer.cancel()
+        }
+        super.onDestroy()
     }
 }
