@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Nooni</string>
+    <string-array name="CallNooni">
+        <item>누니야</item>
+        <item>눈이야</item>
+        <item>눈이와</item>
+        <item>누니와</item>
+        <item>누리야</item>
+        <item>누리와</item>
+        <item>은희야</item>
+    </string-array>
+    <string-array name="camera">
+        <item>카메라</item>
+        <item>홈</item>
+    </string-array>
+    <string-array name="contact">
+        <item>연락처</item>
+    </string-array>
+    <string-array name="allergy">
+        <item>알레르기</item>
+        <item>알러지</item>
+    </string-array>
+    <string name="NooniReady">네 말씀해주세요</string>
+    <string name="NooniAgain">다시한번 말씀해주세요</string>
 </resources>

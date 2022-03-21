@@ -18,6 +18,7 @@ import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,7 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mRecognizer: SpeechRecognizer
     lateinit var tts: TextToSpeech
     lateinit var viewpager: ViewPager2
-    lateinit var i:Intent
+    lateinit var i: Intent
+    private var cnt = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -46,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
         sttViewModel.nooni.observe(this) {
             if (sttViewModel.nooni.value == true) {
-                ttsSpeak("네 말씀해주세요")
+                ttsSpeak(resources.getString(R.string.NooniReady))
             }
         }
     }
@@ -165,8 +167,9 @@ class MainActivity : AppCompatActivity() {
                 SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "말하는 시간초과"
                 else -> "알 수 없는 오류임"
             }
-            ttsSpeak("오류가 발생했습니다.")
+            //ttsSpeak("오류가 발생했습니다.")
             Log.d("tst5", "onError: $message")
+            mRecognizer.startListening(i)
 
         }
 
@@ -184,7 +187,7 @@ class MainActivity : AppCompatActivity() {
             resultStr = resultStr.replace(" ", "");
             moveActivity(resultStr);
             Log.d("tst5", "onResult: $matches")
-           mRecognizer.startListening(i)
+            mRecognizer.startListening(i)
         }
 
         override fun onPartialResults(partialResults: Bundle) {
@@ -197,20 +200,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun moveActivity(resultString: String) {
+        //누니야 부른상태 <- true
         if (sttViewModel.nooni.value == true) {
-            if (viewpager.currentItem != 1
-                && (resultString.indexOf("카메라") > -1
-                || resultString.indexOf("홈") > -1)
-            ) {
-                viewpager.currentItem = 1
-                sttViewModel.setNooni(false)
-            } else if (viewpager.currentItem != 2 && resultString.indexOf("연락처") > -1) {
-                viewpager.currentItem = 2
-                sttViewModel.setNooni(false)
+
+            //카메라(홈)화면으로 가기위한 말을 했는지 탐색 찾으면 수행하고 종료
+            resources.getStringArray(R.array.camera).forEach {
+                if (resultString.indexOf(it) > -1) {
+                    viewpager.currentItem = 1
+                    sttViewModel.setNooni(false)
+                    return@moveActivity
+                }
             }
+
+            //연락처로 가기위한 말했는지 탐색 찾으면 수행하고 종료
+            resources.getStringArray(R.array.contact).forEach {
+                if (resultString.indexOf(it) > -1) {
+                    viewpager.currentItem = 2
+                    sttViewModel.setNooni(false)
+                    return@moveActivity
+                }
+            }
+
+            //1회만 다시말하기 요청 또 오류나면 누니종료 <- 누니야 다시 시작해야함
+            if (cnt == 0) {
+                ttsSpeak(resources.getString(R.string.NooniAgain))
+                cnt++
+            } else {
+                sttViewModel.setNooni(false)
+                cnt = 0
+            }
+            return@moveActivity
         }
-        if (resultString.indexOf("누니야") > -1 || resultString.indexOf("눈이야") > -1) {
-            sttViewModel.setNooni(true)
+        //누니야를 부르는것 탐색
+        resources.getStringArray(R.array.CallNooni).forEach {
+            if (resultString.indexOf(it) > -1) {
+                sttViewModel.setNooni(true)
+                return@moveActivity
+            }
         }
     }
 }
