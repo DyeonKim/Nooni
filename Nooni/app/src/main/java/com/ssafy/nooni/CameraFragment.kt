@@ -340,8 +340,8 @@ class CameraFragment : Fragment() {
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
                 bcode = jsonObject.getString("bcode")
+                Log.d(TAG, "setBottomSheetData: bcode = $bcode")
             }
-            Log.d(TAG, "setBottomSheetData: bcode = $bcode")
         }
 
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
@@ -352,7 +352,19 @@ class CameraFragment : Fragment() {
             var price = ""
             Log.d(TAG, "setBottomSheetData: $contentData")
 
+            for(data in contentData) {
+                val element = data.select("td")
+                for(j in 0 until element.size) {
+                    val label = element[j].text()
+                    if(label == "소비자가격")
+                        price = element[j+1].text()
+                }
+                Log.d(TAG, "setBottomSheetData: price = $price")
+                binding.tvCameraFBsPrice.text = "${price}"
+            }
+
         }
+
 
     }
 
