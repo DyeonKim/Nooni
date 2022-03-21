@@ -96,6 +96,16 @@ dependencies {
     // The GPU delegate library is optional. Depend on it as needed.
     implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly-SNAPSHOT'
     implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly-SNAPSHOT'
+    // Kakao
+    implementation "com.kakao.sdk:v2-talk-rx:2.4.2" // 친구, 메시지(카카오톡)
+    implementation "com.kakao.sdk:v2-link-rx:2.4.2" // 메시지(카카오링크)
+    implementation "com.kakao.sdk:v2-talk:2.4.2" // 친구, 메시지(카카오톡)
+    implementation "com.kakao.sdk:v2-link:2.4.2" // 메시지(카카오링크)
+    // Kakao
+    implementation "com.kakao.sdk:v2-talk-rx:2.4.2" // 친구, 메시지(카카오톡)
+    implementation "com.kakao.sdk:v2-link-rx:2.4.2" // 메시지(카카오링크)
+    implementation "com.kakao.sdk:v2-talk:2.4.2" // 친구, 메시지(카카오톡)
+    implementation "com.kakao.sdk:v2-link:2.4.2" // 메시지(카카오링크)
 
     //Joup
     implementation 'org.jsoup:jsoup:1.11.3'
