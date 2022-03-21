@@ -18,7 +18,6 @@ import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mRecognizer: SpeechRecognizer
     lateinit var tts: TextToSpeech
     lateinit var viewpager: ViewPager2
-    lateinit var i: Intent
+    lateinit var sttIntent: Intent
     private var cnt = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +43,44 @@ class MainActivity : AppCompatActivity() {
         STTinit()
 
         sttViewModel.stt.observe(this) {
+            val resultString = sttViewModel.stt.value!!
+            if (sttViewModel.nooni.value == true) {
+
+                //카메라(홈)화면으로 가기위한 말을 했는지 탐색 찾으면 수행하고 종료
+                resources.getStringArray(R.array.camera).forEach {
+                    if (resultString.indexOf(it) > -1) {
+                        viewpager.currentItem = 1
+                        sttViewModel.setNooni(false)
+                        return@observe
+                    }
+                }
+
+                //연락처로 가기위한 말했는지 탐색 찾으면 수행하고 종료
+                resources.getStringArray(R.array.contact).forEach {
+                    if (resultString.indexOf(it) > -1) {
+                        viewpager.currentItem = 2
+                        sttViewModel.setNooni(false)
+                        return@observe
+                    }
+                }
+
+                //1회만 다시말하기 요청 또 오류나면 누니종료 <- 누니야 다시 시작해야함
+                if (cnt == 0) {
+                    ttsSpeak(resources.getString(R.string.NooniAgain))
+                    cnt++
+                } else {
+                    sttViewModel.setNooni(false)
+                    cnt = 0
+                }
+                return@observe
+            }
+            //누니야를 부르는것 탐색
+            resources.getStringArray(R.array.CallNooni).forEach {
+                if (resultString.indexOf(it) > -1) {
+                    sttViewModel.setNooni(true)
+                    return@observe
+                }
+            }
             Log.d("tst5", "onCreate:1111 " + sttViewModel.stt.value)
         }
         sttViewModel.nooni.observe(this) {
@@ -53,13 +90,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //STT 시작
     fun STTinit() {
-        i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
-        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
+        sttIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        sttIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+        sttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
         mRecognizer.setRecognitionListener(sttlistener)
-        mRecognizer.startListening(i)
+        mRecognizer.startListening(sttIntent)
     }
 
     private fun init() {
@@ -169,7 +207,7 @@ class MainActivity : AppCompatActivity() {
             }
             //ttsSpeak("오류가 발생했습니다.")
             Log.d("tst5", "onError: $message")
-            mRecognizer.startListening(i)
+            mRecognizer.startListening(sttIntent)
 
         }
 
@@ -182,12 +220,12 @@ class MainActivity : AppCompatActivity() {
                 resultStr += matches[i];
                 //textView.setText(matches!![i])
             }
-            sttViewModel.setStt(matches)
+
             if (resultStr.isEmpty()) return
-            resultStr = resultStr.replace(" ", "");
-            moveActivity(resultStr);
+            resultStr = resultStr.replace(" ", "")
+            sttViewModel.setStt(resultStr)
             Log.d("tst5", "onResult: $matches")
-            mRecognizer.startListening(i)
+            mRecognizer.startListening(sttIntent)
         }
 
         override fun onPartialResults(partialResults: Bundle) {
@@ -196,47 +234,6 @@ class MainActivity : AppCompatActivity() {
 
         override fun onEvent(eventType: Int, params: Bundle) {
             // 향후 이벤트를 추가하기 위해 예약
-        }
-    }
-
-    fun moveActivity(resultString: String) {
-        //누니야 부른상태 <- true
-        if (sttViewModel.nooni.value == true) {
-
-            //카메라(홈)화면으로 가기위한 말을 했는지 탐색 찾으면 수행하고 종료
-            resources.getStringArray(R.array.camera).forEach {
-                if (resultString.indexOf(it) > -1) {
-                    viewpager.currentItem = 1
-                    sttViewModel.setNooni(false)
-                    return@moveActivity
-                }
-            }
-
-            //연락처로 가기위한 말했는지 탐색 찾으면 수행하고 종료
-            resources.getStringArray(R.array.contact).forEach {
-                if (resultString.indexOf(it) > -1) {
-                    viewpager.currentItem = 2
-                    sttViewModel.setNooni(false)
-                    return@moveActivity
-                }
-            }
-
-            //1회만 다시말하기 요청 또 오류나면 누니종료 <- 누니야 다시 시작해야함
-            if (cnt == 0) {
-                ttsSpeak(resources.getString(R.string.NooniAgain))
-                cnt++
-            } else {
-                sttViewModel.setNooni(false)
-                cnt = 0
-            }
-            return@moveActivity
-        }
-        //누니야를 부르는것 탐색
-        resources.getStringArray(R.array.CallNooni).forEach {
-            if (resultString.indexOf(it) > -1) {
-                sttViewModel.setNooni(true)
-                return@moveActivity
-            }
         }
     }
 }
