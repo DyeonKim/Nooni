@@ -3,15 +3,13 @@ package com.ssafy.nooni
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
+import android.os.Handler
 import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Handler
-import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.ERROR
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.Viewmodel.SttViewModel
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
@@ -25,11 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
     private val sttViewModel: SttViewModel by viewModels()
-    private lateinit var mRecognizer: SpeechRecognizer
-    private lateinit var sttUtil:STTUtil
+    private lateinit var sttUtil: STTUtil
     lateinit var tts: TextToSpeech
     lateinit var viewpager: ViewPager2
-    lateinit var sttIntent: Intent
     private var cnt = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 init()
             }
         }
-        sttUtil.STTinit(this,packageName)
+        sttUtil.STTinit(this, packageName)
 
         sttViewModel.stt.observe(this) {
             val resultString = sttViewModel.stt.value!!
@@ -66,6 +62,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
+                resources.getStringArray(R.array.allergy).forEach {
+                    if(resultString.indexOf(it)>-1){
+                        startActivity(Intent(this,RegisterAllergyActivity::class.java))
+                        sttViewModel.setNooni(false)
+                        return@observe
+                    }
+                }
                 //1회만 다시말하기 요청 또 오류나면 누니종료 <- 누니야 다시 시작해야함
                 if (cnt == 0) {
                     ttsSpeak(resources.getString(R.string.NooniAgain))
@@ -91,6 +94,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun init() {
         viewpager = binding.viewpager
         val viewpagerFragmentAdapter = ViewpagerFragmentAdapter(this)
@@ -131,15 +135,20 @@ class MainActivity : AppCompatActivity() {
         }, 1200)
     }
 
+    override fun onRestart() {
+        sttUtil.STTinit(this, packageName)
+        super.onRestart()
+    }
+    override fun onStop() {
+        sttUtil.stop()
+        super.onStop()
+    }
     override fun onDestroy() {
         if (tts != null) {
             tts.stop()
             tts.shutdown()
         }
-        if (mRecognizer != null) {
-            mRecognizer.destroy()
-            mRecognizer.cancel()
-        }
+        sttUtil.stop()
         super.onDestroy()
     }
 
