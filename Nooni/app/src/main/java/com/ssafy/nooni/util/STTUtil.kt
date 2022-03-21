@@ -97,4 +97,10 @@ class STTUtil(owner: ViewModelStoreOwner) {
             // 향후 이벤트를 추가하기 위해 예약
         }
     }
+    fun stop(){
+        if (mRecognizer != null) {
+            mRecognizer.destroy()
+            mRecognizer.cancel()
+        }
+    }
 }
