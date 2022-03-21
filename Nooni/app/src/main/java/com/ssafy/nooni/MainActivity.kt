@@ -9,11 +9,15 @@ import android.speech.SpeechRecognizer
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import android.os.Handler
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeech.ERROR
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.Viewmodel.SttViewModel
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var permissionUtil: PermissionUtil
     private val sttViewModel:SttViewModel by viewModels()
     private lateinit var mRecognizer:SpeechRecognizer
+    lateinit var tts: TextToSpeech
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -54,11 +60,50 @@ class MainActivity : AppCompatActivity() {
 
         viewpager.adapter = viewpagerFragmentAdapter
         viewpager.currentItem = 1
+
+        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
+            @Override
+            fun onInit(status: Int){
+                if(status != ERROR){
+                    tts.language = Locale.KOREA
+                }
+            }
+        })
+    }
+
+    fun ttsSpeak(text: String){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
     }
 
     override fun onStart() {
         super.onStart()
         checkPermissions()
+    }
+
+    override fun onBackPressed(){
+        tts.speak("누니를 종료합니다.", TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler()
+        handler.postDelayed(Runnable{
+            tts.shutdown()
+            moveTaskToBack(true)
+            finish()
+        }, 1200)
+    }
+
+    override fun onDestroy() {
+        if(tts != null){
+            tts.stop()
+            tts.shutdown()
+        }
+        if(mRecognizer!=null){
+            mRecognizer.destroy()
+            mRecognizer.cancel()
+        }
+        super.onDestroy()
     }
 
     private fun checkPermissions() {
@@ -141,13 +186,5 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RegisterAllergyActivity::class.java)
             startActivity(intent)
         }
-    }
-
-    override fun onDestroy() {
-        if(mRecognizer!=null){
-            mRecognizer.destroy()
-            mRecognizer.cancel()
-        }
-        super.onDestroy()
     }
 }

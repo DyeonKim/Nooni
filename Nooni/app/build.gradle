@@ -34,6 +34,7 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        mlModelBinding true
     }
 }
 
@@ -86,4 +87,13 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
+    // Also declare the dependency for the TensorFlow Lite library and specify its version
+    implementation 'org.tensorflow:tensorflow-lite:2.3.0'
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
+
+    // Import tflite dependencies
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly-SNAPSHOT'
+    // The GPU delegate library is optional. Depend on it as needed.
+    implementation 'org.tensorflow:tensorflow-lite-gpu:0.0.0-nightly-SNAPSHOT'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.0.0-nightly-SNAPSHOT'
 }
