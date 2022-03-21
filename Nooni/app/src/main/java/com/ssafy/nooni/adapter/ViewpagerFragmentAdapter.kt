@@ -6,10 +6,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.ssafy.nooni.AllergyFragment
 import com.ssafy.nooni.CameraFragment
 import com.ssafy.nooni.ContactFragment
+import com.ssafy.nooni.MapFragment
 
 class ViewpagerFragmentAdapter(fragmentActivity: FragmentActivity): FragmentStateAdapter(fragmentActivity) {
     // 1. ViewPager2에 연결할 Fragment 들을 생성
-    val fragmentList = listOf<Fragment>(AllergyFragment(), CameraFragment(), ContactFragment())
+    val fragmentList = listOf<Fragment>(AllergyFragment(), CameraFragment(), ContactFragment(), MapFragment())
 
     // 2. ViewPager2에서 노출시킬 Fragment 의 갯수 설정
     override fun getItemCount(): Int {
