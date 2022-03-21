@@ -4,6 +4,9 @@ plugins {
     id 'kotlin-kapt'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdk 32
 
@@ -13,6 +16,8 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "TMAP_API_KEY", properties['tmap_api_key']
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
