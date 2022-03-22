@@ -1,6 +1,5 @@
 package com.ssafy.nooni
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -25,13 +24,11 @@ class RegisterAllergyActivity : AppCompatActivity() {
     val list = listOf<String>("갑각류", "견과", "달걀", "땅콩", "밀", "생선", "우유", "조개", "콩")
     val allergyList = ArrayList<String>()
     var cnt = 0
-    private lateinit var sttUtil: STTUtil
     private val sttViewModel: SttViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterAllergyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sttUtil = STTUtil(this)
         tts2 = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
             fun onInit(status: Int) {
@@ -40,8 +37,8 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
         })
-
-        sttUtil.STTinit(this, packageName)
+        STTUtil.owner=this
+        STTUtil.STTVM()
         init()
         Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
         sttViewModel.stt.observe(this) {
@@ -111,23 +108,17 @@ class RegisterAllergyActivity : AppCompatActivity() {
         sharePrefArrayListUtil.setStringArrayPref(this, "allergies", allergyList)
         Toast.makeText(this, "알레르기 정보 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
         tts2.speak("알레르기 정보 등록이 완료되었습니다.", TextToSpeech.QUEUE_FLUSH, null)
-        sttUtil.stop()
         finish()
     }
 
     override fun onRestart() {
-        sttUtil.STTinit(this, packageName)
+        STTUtil.owner=this
+        STTUtil.STTVM()
         super.onRestart()
-    }
-
-    override fun onStop() {
-        sttUtil.stop()
-        super.onStop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        sttUtil.stop()
         if (tts2 != null) {
             tts2.stop()
             tts2.shutdown()
@@ -135,7 +126,6 @@ class RegisterAllergyActivity : AppCompatActivity() {
     }
     override fun onBackPressed() {
         tts2.speak("이전화면으로 돌아갑니다", TextToSpeech.QUEUE_FLUSH, null)
-        sttUtil.stop()
         val handler = Handler()
         handler.postDelayed(Runnable {
             tts2.shutdown()

@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
@@ -23,7 +22,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
     private val sttViewModel: SttViewModel by viewModels()
-    lateinit var sttUtil: STTUtil
     lateinit var tts: TextToSpeech
     lateinit var viewpager: ViewPager2
     private var cnt = 0
@@ -31,14 +29,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sttUtil = STTUtil(this)
+        STTUtil.owner = this
+        STTUtil.STTinit(this, packageName)
         permissionUtil = PermissionUtil(this)
         permissionUtil.permissionListener = object : PermissionUtil.PermissionListener {
             override fun run() {
                 init()
             }
         }
-        sttUtil.STTinit(this, packageName)
+
 
         sttViewModel.stt.observe(this) {
             val resultString = sttViewModel.stt.value!!
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
                 resources.getStringArray(R.array.allergy).forEach {
                     if(resultString.indexOf(it)>-1){
-                        sttUtil.stop()
+                        //STTUtil.stop()
                         startActivity(Intent(this,RegisterAllergyActivity::class.java))
                         sttViewModel.setNooni(false)
                         return@observe
@@ -137,20 +136,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        sttUtil = STTUtil(this)
-        sttUtil.STTinit(this,packageName)
+        STTUtil.owner=this
+        STTUtil.STTVM()
         super.onRestart()
-    }
-    override fun onStop() {
-        sttUtil.stop()
-        super.onStop()
     }
     override fun onDestroy() {
         if (tts != null) {
             tts.stop()
             tts.shutdown()
         }
-        sttUtil.stop()
+        STTUtil.stop()
         super.onDestroy()
     }
 
