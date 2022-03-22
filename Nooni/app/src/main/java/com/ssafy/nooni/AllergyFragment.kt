@@ -107,6 +107,7 @@ class AllergyFragment : Fragment() {
         override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
+            mainActivity.sttUtil.stop()
             startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
             return true
         }
