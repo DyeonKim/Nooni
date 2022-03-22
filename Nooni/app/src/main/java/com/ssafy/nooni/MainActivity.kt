@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var permissionUtil: PermissionUtil
     private val sttViewModel: SttViewModel by viewModels()
-    private lateinit var sttUtil: STTUtil
+    lateinit var sttUtil: STTUtil
     lateinit var tts: TextToSpeech
     lateinit var viewpager: ViewPager2
     private var cnt = 0
@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
                 resources.getStringArray(R.array.allergy).forEach {
                     if(resultString.indexOf(it)>-1){
+                        sttUtil.stop()
                         startActivity(Intent(this,RegisterAllergyActivity::class.java))
                         sttViewModel.setNooni(false)
                         return@observe
@@ -136,7 +137,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        sttUtil.STTinit(this, packageName)
+        sttUtil.stop()
+        sttUtil = STTUtil(this)
+        sttUtil.STTinit(this,packageName)
         super.onRestart()
     }
     override fun onStop() {
