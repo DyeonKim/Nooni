@@ -15,20 +15,31 @@ import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.Viewmodel.SttViewModel
 import kotlin.properties.ReadOnlyProperty
 
-class STTUtil(owner: ViewModelStoreOwner) {
+object STTUtil {
+    var owner:ViewModelStoreOwner? = null
     lateinit var sttIntent: Intent
     private var mRecognizer: SpeechRecognizer? = null
-    private val sttViewModel =
-        ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory())[SttViewModel::class.java]
+    private lateinit var sttViewModel:SttViewModel
 
     //STT 시작
+    fun STTVM(){
+        sttViewModel =
+            ViewModelProvider(owner!!, ViewModelProvider.NewInstanceFactory())[SttViewModel::class.java]
+    }
     fun STTinit(context: Context, packageName: String) {
+        Log.d("tst7", "STTinit: "+ owner)
+        Log.d("tst7", "STTinit: "+ mRecognizer)
+        stop()
+        sttViewModel =
+            ViewModelProvider(owner!!, ViewModelProvider.NewInstanceFactory())[SttViewModel::class.java]
         sttIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         sttIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
         sttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
         mRecognizer!!.setRecognitionListener(sttlistener)
         mRecognizer!!.startListening(sttIntent)
+        Log.d("tst7", "STTinit: "+ mRecognizer)
+
     }
 
     val sttlistener: RecognitionListener = object : RecognitionListener {
