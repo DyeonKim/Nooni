@@ -50,32 +50,57 @@ class MapFragment : Fragment(), TMapGpsManager.onLocationChangedCallback {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "길안내"
         mainActivity.ttsSpeak("길 안내 화면입니다.")
-//        tMapView.onResume()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setAuth()
+        setMap()
+        setGps()
+
+    }
+
+    private fun setAuth(){
         tMapView = TMapView(requireContext())
         tMapGpsManager = TMapGpsManager(requireActivity())
 
         tMapView.setSKTMapApiKey(key)
+    }
 
+    private fun setMap(){
         tMapView.zoomLevel =  17
         tMapView.setIconVisibility(true)
         tMapView.mapType = TMapView.MAPTYPE_STANDARD
         tMapView.setLanguage(TMapView.LANGUAGE_KOREAN)
 
         binding.llTmap.addView(tMapView)
+    }
 
-        tMapGpsManager.minTime = 1000
-        tMapGpsManager.minDistance = 10F
-        tMapGpsManager.provider = TMapGpsManager.NETWORK_PROVIDER
-
-        tMapGpsManager.OpenGps()
-        setGps()
-
-
+    private fun setGps() {
+        val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                1
+            )
+        }
+        lm.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,  // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
+            1000, 1f,  // 통지사이의 최소 변경거리 (m)
+            mLocationListener
+        )
     }
 
     override fun onLocationChange(location: Location) {
@@ -104,30 +129,6 @@ class MapFragment : Fragment(), TMapGpsManager.onLocationChangedCallback {
         override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
     }
 
-    private fun setGps() {
-        val lm = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                1
-            )
-        }
-        lm.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER,  // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-            1000, 1f,  // 통지사이의 최소 변경거리 (m)
-            mLocationListener
-        )
-    }
+
 
 }
