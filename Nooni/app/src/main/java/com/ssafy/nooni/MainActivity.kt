@@ -137,7 +137,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        sttUtil.stop()
         sttUtil = STTUtil(this)
         sttUtil.STTinit(this,packageName)
         super.onRestart()
