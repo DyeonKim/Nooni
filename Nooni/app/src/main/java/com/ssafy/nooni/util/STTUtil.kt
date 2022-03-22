@@ -17,18 +17,20 @@ import kotlin.properties.ReadOnlyProperty
 
 class STTUtil(owner: ViewModelStoreOwner) {
     lateinit var sttIntent: Intent
-    private lateinit var mRecognizer: SpeechRecognizer
-    private val sttViewModel = ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory())[SttViewModel::class.java]
+    private var mRecognizer: SpeechRecognizer? = null
+    private val sttViewModel =
+        ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory())[SttViewModel::class.java]
 
     //STT 시작
-    fun STTinit(context: Context,packageName:String) {
+    fun STTinit(context: Context, packageName: String) {
         sttIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         sttIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
         sttIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-        mRecognizer.setRecognitionListener(sttlistener)
-        mRecognizer.startListening(sttIntent)
+        mRecognizer!!.setRecognitionListener(sttlistener)
+        mRecognizer!!.startListening(sttIntent)
     }
+
     val sttlistener: RecognitionListener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle) {
             // 말하기 시작할 준비가되면 호출
@@ -68,7 +70,7 @@ class STTUtil(owner: ViewModelStoreOwner) {
             }
             //ttsSpeak("오류가 발생했습니다.")
             Log.d("tst5", "onError: $message")
-            mRecognizer.startListening(sttIntent)
+            mRecognizer!!.startListening(sttIntent)
 
         }
 
@@ -86,7 +88,7 @@ class STTUtil(owner: ViewModelStoreOwner) {
             resultStr = resultStr.replace(" ", "")
             sttViewModel.setStt(resultStr)
             Log.d("tst5", "onResult: $matches")
-            mRecognizer.startListening(sttIntent)
+            mRecognizer!!.startListening(sttIntent)
         }
 
         override fun onPartialResults(partialResults: Bundle) {
@@ -97,10 +99,12 @@ class STTUtil(owner: ViewModelStoreOwner) {
             // 향후 이벤트를 추가하기 위해 예약
         }
     }
-    fun stop(){
+
+    fun stop() {
         if (mRecognizer != null) {
-            mRecognizer.destroy()
-            mRecognizer.cancel()
+            mRecognizer!!.destroy()
+            mRecognizer!!.cancel()
+            mRecognizer = null
         }
     }
 }
