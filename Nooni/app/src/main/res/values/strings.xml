@@ -23,4 +23,23 @@
     </string-array>
     <string name="NooniReady">네 말씀해주세요</string>
     <string name="NooniAgain">다시한번 말씀해주세요</string>
+    <string-array name="yes">
+        <item>네</item>
+        <item>예</item>
+        <item>어</item>
+        <item>그래</item>
+        <item>있어요</item>
+        <item>있음</item>
+        <item>있습니다</item>
+    </string-array>
+    <string-array name="no">
+        <item>아니요</item>
+        <item>안이요</item>
+        <item>아니오</item>
+        <item>안이오</item>
+        <item>아니</item>
+        <item>없다</item>
+        <item>없습니다</item>
+        <item>없어요</item>
+    </string-array>
 </resources>
