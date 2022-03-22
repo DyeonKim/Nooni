@@ -3,7 +3,6 @@ package com.ssafy.nooni
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.view.*
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -11,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
+import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
 
 
@@ -107,7 +107,7 @@ class AllergyFragment : Fragment() {
         override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            mainActivity.sttUtil.stop()
+            STTUtil.stop()
             startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
             return true
         }
