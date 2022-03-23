@@ -7,38 +7,44 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.skt.Tmap.TMapView
 import com.ssafy.nooni.databinding.FragmentMapBinding
 
-import com.skt.Tmap.TMapData
 import com.skt.Tmap.poi_item.TMapPOIItem
-
-import com.skt.Tmap.TMapPoint
 
 import android.graphics.Bitmap
 
-import com.skt.Tmap.TMapMarkerItem
 import android.graphics.BitmapFactory
 import com.skt.Tmap.TMapData.*
 
 import com.skt.Tmap.TMapData.FindAroundNamePOIListenerCallback
 
 import android.graphics.Color
+import android.location.Location
+import android.speech.tts.TextToSpeech
+import android.util.Log
+import android.widget.Toast
+import com.skt.Tmap.*
 
 import com.ssafy.nooni.util.GpsTracker
 
-import com.skt.Tmap.TMapCircle
 import java.lang.Exception
+import com.skt.Tmap.TMapData.TMapPathType
+import com.ssafy.nooni.entity.Contact
+import com.ssafy.nooni.ui.SelectDialog
+import org.w3c.dom.Element
+import org.w3c.dom.NodeList
 
 
-class MapFragment : Fragment() {
+class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     private lateinit var binding: FragmentMapBinding
     private lateinit var mainActivity: MainActivity
 
     private val key = BuildConfig.TMAP_API_KEY
 
     private lateinit var tMapView: TMapView
+    private lateinit var tMapGpsManager: TMapGpsManager
     private var gpsTracker: GpsTracker? = null
+    var minDistance = Double.POSITIVE_INFINITY
 
     var latitude = 0.0
     var longitude = 0.0
@@ -70,8 +76,6 @@ class MapFragment : Fragment() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "길안내"
         mainActivity.ttsSpeak("길 안내 화면입니다.")
-
-        tMapView.onResume()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,16 +95,17 @@ class MapFragment : Fragment() {
     private fun setAuth(){
         tMapView = TMapView(requireContext())
         tMapView.setSKTMapApiKey(key)
+
     }
 
     private fun setMap(){
         tMapView.zoomLevel =  17
-        tMapView.setIconVisibility(true)
+        tMapView.setIconVisibility(false)
         tMapView.mapType = TMapView.MAPTYPE_STANDARD
         tMapView.setLanguage(TMapView.LANGUAGE_KOREAN)
-//        tMapView.setCompassMode(true);
-        //tMapView.setTrackingMode(true);
-        tMapView.setSightVisible(true)
+//        tMapView.setCompassMode(true)
+        tMapView.setSightVisible(true)  // 시야표출 사용 여부
+        tMapView.setTrackingMode(true)  // 화면 중심을 단말의 현재 위치로 이동
 
     }
 
@@ -154,18 +159,19 @@ class MapFragment : Fragment() {
         //500m, 100m 원 그리는 메소드
         drawCircle()
 
+        var itemInfo = TMapPOIItem()
         //"편의점" 키워드로 검색
         tMapData.findAroundNamePOI(tMapPoint, "편의점",
             FindAroundNamePOIListenerCallback { poiItem ->
                 if (poiItem == null) return@FindAroundNamePOIListenerCallback
                 val tMapPointStart = TMapPoint(latitude, longitude) // 출발지
                 tMapView.removeAllMarkerItem()
-                var minDistance = Double.POSITIVE_INFINITY
+//                var minDistance = Double.POSITIVE_INFINITY
                 var minDistancePoint: TMapPoint? = null
 
 
                 //텍스트 뷰에 넣을 편의점 정보
-                var itemInfo = TMapPOIItem()
+//                var itemInfo = TMapPOIItem()
                 for (i in 0 until poiItem.size) {
                     val item = poiItem[i] as TMapPOIItem
                     val distance = item.getDistance(tMapPointStart)
@@ -206,14 +212,65 @@ class MapFragment : Fragment() {
                         minDistancePolyLine.lineColor = R.color.nooni
                         minDistancePolyLine.outLineColor = R.color.nooni
                         minDistancePolyLine.lineWidth = 5f
-                        tMapView.addTMapPolyLine("minDistanceLine", minDistancePolyLine)
+//                        tMapView.addTMapPolyLine("minDistanceLine", minDistancePolyLine)
+                        tMapView.addTMapPath(minDistancePolyLine)
                         binding.textView5.text = itemInfo.poiName
-
+                        mainActivity.tts.speak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.", TextToSpeech.QUEUE_ADD, null)
+//                        mainActivity.ttsSpeak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.")
+//                        showSelectDialog(itemInfo.poiName)
                     }
+
+
+//                    // 이동경로에 대한 description 받아오기
+//                    tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, tMapPointStart, minDistancePoint,
+//                        FindPathDataAllListenerCallback { document ->
+//                            val root: Element = document.documentElement
+//                            val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
+//                            for (i in 0 until nodeListPlacemark.length) {
+//                                val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(i).childNodes
+//                                for (j in 0 until nodeListPlacemarkItem.length) {
+//                                    if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
+////                                        Log.d("debug", nodeListPlacemarkItem.item(j).textContent.trim())
+//                                        Toast.makeText(requireContext(), "${nodeListPlacemarkItem.item(j).textContent.trim()}", Toast.LENGTH_SHORT).show()
+//                                    }
+//                                }
+//                            }
+//                        })
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             })
+
+        binding.textView5.setOnClickListener {
+            mainActivity.ttsSpeak("길 안내를 시작하시겠습니까?")
+            showSelectDialog()
+        }
+    }
+
+    override fun onLocationChange(p0: Location?) {
+        tMapView.setCenterPoint(p0!!.longitude, p0!!.latitude, true)
+        tMapView.setLocationPoint(p0!!.longitude, p0!!.latitude)
+    }
+
+    private fun showSelectDialog(){
+        SelectDialog(requireContext())
+            .setContent("길 안내를 시작하시겠습니까?")
+            .setOnNegativeClickListener{
+                mainActivity.tts.stop()
+            }
+            .setOnPositiveClickListener{
+                startNavi()
+            }.build().show()
+    }
+
+    private fun startNavi(){
+        tMapGpsManager = TMapGpsManager(requireContext())
+        tMapGpsManager.apply{
+            minTime = 1000
+            minDistance = 1F
+            provider = TMapGpsManager.NETWORK_PROVIDER
+        }
+        tMapGpsManager.OpenGps()
     }
 
 }
