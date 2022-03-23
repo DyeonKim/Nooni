@@ -142,12 +142,12 @@
                 android:background="@drawable/dotted_line" />
 
             <TextView
-                android:id="@+id/tv_cameraF_bs_calorie"
+                android:id="@+id/tv_cameraF_bs_notice_allergy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="320Kcal"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
+                android:text="확인 중..."
                 android:textAlignment="center"
                 android:textColor="@color/grey"
                 android:textSize="24sp" />
