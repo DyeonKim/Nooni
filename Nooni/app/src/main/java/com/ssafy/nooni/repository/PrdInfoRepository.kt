@@ -12,7 +12,7 @@ class PrdInfoRepository {
     val prdInfoService = ApplicationClass.pRetrofit.create(PrdInfoApi::class.java)
     val _allergenList = MutableLiveData<List<String>>()
 
-    suspend fun getAllergen(prdNo: String) {
+    suspend fun loadAllergen(prdNo: String) {
         var list = listOf("알 수 없음")
 
         try {
