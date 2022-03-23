@@ -1,20 +1,13 @@
 package com.ssafy.nooni
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.LinearLayout
@@ -29,11 +22,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.kakao.sdk.common.util.Utility
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import com.ssafy.nooni.ml.Model
@@ -49,19 +40,15 @@ import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.IOException
 import java.lang.Exception
-import java.net.URLDecoder
-import java.net.URLEncoder
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.channels.AsynchronousFileChannel.open
-import java.text.SimpleDateFormat
 import java.util.*
 import com.kakao.sdk.link.LinkClient
 import com.kakao.sdk.link.rx
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
-import com.ssafy.nooni.Viewmodel.PrdInfoViewModel
+import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -387,7 +374,7 @@ class CameraFragment : Fragment() {
 
         }
 
-        prdInfoViewModel.getAllergen(prdNo)
+        prdInfoViewModel.loadAllergen(prdNo)
     }
 
     private fun classifyImage(image: Bitmap, originImage: Bitmap) {
