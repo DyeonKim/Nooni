@@ -51,7 +51,15 @@ class CameraFragment : Fragment() {
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
 
-    private val prdInfoViewModel: PrdInfoViewModel by viewModels()
+    private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return PrdInfoViewModel(requireContext()) as T
+            }
+
+        }
+    }
+
     private val mediaUtil = PlayMediaUtil()
     private lateinit var imageDetectUtil: ImageDetectUtil
     private var imageCapture: ImageCapture? = null
@@ -119,6 +127,9 @@ class CameraFragment : Fragment() {
         })
 
         setBottomSheetRecyclerView()
+        prdInfoViewModel.noticeAllergy.observe(viewLifecycleOwner) {
+            binding.tvCameraFBsNoticeAllergy.text = it
+        }
     }
 
 
@@ -156,9 +167,7 @@ class CameraFragment : Fragment() {
             mAccelerometer,
             SensorManager.SENSOR_DELAY_UI
         )
-
     }
-
 
     private fun initData() {
         dataId = -1
