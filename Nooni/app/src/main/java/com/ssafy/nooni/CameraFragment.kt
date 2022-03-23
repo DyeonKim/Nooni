@@ -404,6 +404,5 @@ class CameraFragment : Fragment() {
         initData()
         super.onPause()
     }
-
 }
 
