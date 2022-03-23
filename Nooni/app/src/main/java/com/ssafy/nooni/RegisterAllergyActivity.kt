@@ -12,6 +12,7 @@ import com.ssafy.nooni.Viewmodel.SttViewModel
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
+import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -21,9 +22,10 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
     private lateinit var tts2: TextToSpeech
     var sharePrefArrayListUtil = SharedPrefArrayListUtil()
-    val list = listOf<String>("갑각류", "견과", "달걀", "땅콩", "밀", "생선", "우유", "조개", "콩")
+    lateinit var list: Array<String>
     val allergyList = ArrayList<String>()
     var cnt = 0
+    var noonicnt = 0
     private val sttViewModel: SttViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +39,8 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
         })
-        STTUtil.owner=this
+        list = resources.getStringArray(R.array.allergyList)
+        STTUtil.owner = this
         STTUtil.STTVM()
         init()
         Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
@@ -47,29 +50,38 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
             resources.getStringArray(R.array.yes).forEach {
                 if (resultString.indexOf(it) > -1) {
-                    // TODO: 예 일때 동작
                     Log.d("tst6", "onCreate: yes")
                     allergyList.add(list[cnt])
                     allergyNext()
-                    sttViewModel.setNooni(false)
                     return@observe
                 }
             }
             resources.getStringArray(R.array.no).forEach {
                 if (resultString.indexOf(it) > -1) {
-                    // TODO: 아니오 일때 동작
                     Log.d("tst6", "onCreate: no")
-                    sttViewModel.setNooni(false)
                     allergyNext()
                     return@observe
                 }
             }
-            ttsSpeak("다시한번 말씀해주세요")
+            if (noonicnt == 0) {
+                if (cnt == 0) {
+                    ttsSpeak(resources.getString(R.string.AllergyQuestion))
+                } else {
+                    ttsSpeak(resources.getString(R.string.NooniAgain))
+                }
+                noonicnt++
+            } else {
+                sttViewModel.setNooni(false)
+                noonicnt = 0
+            }
             return@observe
         }
+
+
         sttViewModel.nooni.observe(this) {
-            if (sttViewModel.nooni.value == true) {
-                ttsSpeak(resources.getString(R.string.NooniReady))
+
+            if (sttViewModel.nooni.value == false) {
+                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
             }
         }
     }
@@ -84,7 +96,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     private fun init() {
         // TODO: 맨 처음 멘트 안나오는거 수정해야함
-        ttsSpeak("나는 갑각류 알레르기가 있다.")
+        Log.d("tst", "init: " + tts2)
         binding.tvAllergyAType.text = list[cnt]
 
         binding.btnAllergyANo.setOnClickListener {
@@ -94,25 +106,36 @@ class RegisterAllergyActivity : AppCompatActivity() {
             allergyList.add(list[cnt])
             allergyNext()
         }
+
     }
 
     private fun allergyNext() {
         if (++cnt >= list.size) save()
         else {
             binding.tvAllergyAType.text = list[cnt]
-            ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다.")
+            // TODO: 이런식으로 안드로이드 string.xml에서 가져와서 연결하면 tts가 깨짐 도대체 왜???? 
+//            val sb = StringBuilder()
+//            sb.append(resources.getString(R.string.AllergyPrefix))
+//            sb.append(list[cnt])
+//            sb.append(resources.getString(R.string.AllergyPostfix))
+//            ttsSpeak(sb.toString())
+            ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
         }
     }
 
     private fun save() {
         sharePrefArrayListUtil.setStringArrayPref(this, "allergies", allergyList)
-        Toast.makeText(this, "알레르기 정보 등록이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-        tts2.speak("알레르기 정보 등록이 완료되었습니다.", TextToSpeech.QUEUE_FLUSH, null)
-        finish()
+        Toast.makeText(this, resources.getString(R.string.AllergyFinish), Toast.LENGTH_SHORT).show()
+        tts2.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler()
+        handler.postDelayed(Runnable {
+            tts2.shutdown()
+            finish()
+        }, 2000)
     }
 
     override fun onRestart() {
-        STTUtil.owner=this
+        STTUtil.owner = this
         STTUtil.STTVM()
         super.onRestart()
     }
@@ -124,8 +147,9 @@ class RegisterAllergyActivity : AppCompatActivity() {
             tts2.shutdown()
         }
     }
+
     override fun onBackPressed() {
-        tts2.speak("이전화면으로 돌아갑니다", TextToSpeech.QUEUE_FLUSH, null)
+        tts2.speak(resources.getString(R.string.GoBack), TextToSpeech.QUEUE_FLUSH, null)
         val handler = Handler()
         handler.postDelayed(Runnable {
             tts2.shutdown()
