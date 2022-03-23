@@ -1,6 +1,7 @@
 package com.ssafy.nooni.config
 
 import android.app.Application
+import com.google.gson.GsonBuilder
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -13,11 +14,13 @@ import java.util.concurrent.TimeUnit
 
 class ApplicationClass:Application() {
     val BASE_URL = "http://70.12.130.105:5000"
+    val PRDINFO_SERVER_URL = "http://apis.data.go.kr/B553748/CertImgListService/"
     val TIME_OUT = 10000L
 
     companion object{
         lateinit var sRetrofit: Retrofit
         lateinit var storageRef: StorageReference
+        lateinit var pRetrofit: Retrofit
     }
     override fun onCreate() {
         super.onCreate()
@@ -26,6 +29,8 @@ class ApplicationClass:Application() {
         initFirebase()
     }
     fun initRetrofit() {
+        val gson = GsonBuilder().setLenient().create()
+
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
             .connectTimeout(TIME_OUT, TimeUnit.MILLISECONDS)
@@ -38,6 +43,11 @@ class ApplicationClass:Application() {
         sRetrofit = Retrofit.Builder().baseUrl(BASE_URL)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        pRetrofit = Retrofit.Builder().baseUrl(PRDINFO_SERVER_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
     fun initKakao() {
