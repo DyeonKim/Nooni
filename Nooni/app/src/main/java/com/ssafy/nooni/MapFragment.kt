@@ -46,6 +46,9 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     private var gpsTracker: GpsTracker? = null
     var minDistance = Double.POSITIVE_INFINITY
 
+    private lateinit var pointFrom: TMapPoint
+    private lateinit var pointTo: TMapPoint
+
     var latitude = 0.0
     var longitude = 0.0
 
@@ -196,6 +199,11 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                     }
                 }
 
+                pointFrom = tMapPointStart
+                if (minDistancePoint != null) {
+                    pointTo = minDistancePoint
+                }
+
                 try {
                     val minDistancePolyLine = TMapData().findPathDataWithType(
                         TMapPathType.PEDESTRIAN_PATH,
@@ -215,27 +223,10 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 //                        tMapView.addTMapPolyLine("minDistanceLine", minDistancePolyLine)
                         tMapView.addTMapPath(minDistancePolyLine)
                         binding.textView5.text = itemInfo.poiName
+
                         mainActivity.tts.speak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.", TextToSpeech.QUEUE_ADD, null)
-//                        mainActivity.ttsSpeak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.")
-//                        showSelectDialog(itemInfo.poiName)
                     }
 
-
-//                    // 이동경로에 대한 description 받아오기
-//                    tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, tMapPointStart, minDistancePoint,
-//                        FindPathDataAllListenerCallback { document ->
-//                            val root: Element = document.documentElement
-//                            val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
-//                            for (i in 0 until nodeListPlacemark.length) {
-//                                val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(i).childNodes
-//                                for (j in 0 until nodeListPlacemarkItem.length) {
-//                                    if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
-////                                        Log.d("debug", nodeListPlacemarkItem.item(j).textContent.trim())
-//                                        Toast.makeText(requireContext(), "${nodeListPlacemarkItem.item(j).textContent.trim()}", Toast.LENGTH_SHORT).show()
-//                                    }
-//                                }
-//                            }
-//                        })
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -271,6 +262,26 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             provider = TMapGpsManager.NETWORK_PROVIDER
         }
         tMapGpsManager.OpenGps()
+
+        // 이동경로에 대한 description 받아오기
+        val tMapData = TMapData()
+        tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, pointFrom, pointTo,
+            FindPathDataAllListenerCallback { document ->
+                val root: Element = document.documentElement
+                val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
+                Log.d("DOC", "startNavi:node length = ${nodeListPlacemark.length} ")
+                for (i in 0 until nodeListPlacemark.length) {
+                    val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(i).childNodes
+                    for (j in 0 until nodeListPlacemarkItem.length) {
+                        if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
+                            Log.d("debug", "#$i : ${nodeListPlacemarkItem.item(j).textContent.trim()}")
+                            mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
+                        }
+                    }
+                }
+            })
+
+        tMapGpsManager.CloseGps()
     }
 
 }
