@@ -69,6 +69,9 @@ class PrdInfoViewModel(private val context: Context) : ViewModel(){
                     if (allergies.contains("콩"))
                         return "알레르기 유발 물질이 있습니다."
                 }
+                it == "알 수 없음" -> {
+                    return "알레르기 유발 물질을 알 수 없습니다."
+                }
             }
         }
         return "알레르기 유발 물질이 없습니다."
