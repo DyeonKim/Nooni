@@ -103,7 +103,7 @@
                 android:id="@+id/tv_cameraF_bs_price"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="23,000원"
+                android:text=""
                 android:layout_margin="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/black"
