@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Nooni</string>
+    <string name="shared_file">USER_INFO</string>
     <string name="firebase_storage_url_head">https://storage.googleapis.com/nooni-a587a.appspot.com/images/</string>
     <string-array name="CallNooni">
         <item>누니야</item>
