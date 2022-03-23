@@ -19,6 +19,8 @@ import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.core.impl.ImageCaptureConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +36,7 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
+import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 
 
 private const val TAG = "CameraFragment"
@@ -48,6 +51,7 @@ class CameraFragment : Fragment() {
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
 
+    private val prdInfoViewModel: PrdInfoViewModel by viewModels()
     private val mediaUtil = PlayMediaUtil()
     private lateinit var imageDetectUtil: ImageDetectUtil
     private var imageCapture: ImageCapture? = null
@@ -236,7 +240,10 @@ class CameraFragment : Fragment() {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
+
+        prdInfoViewModel.allergenList.observe(viewLifecycleOwner) {
+            allergyRVAdapter.setData(it)
+        }
     }
 
     private fun setProductData() {
@@ -248,15 +255,17 @@ class CameraFragment : Fragment() {
         // JSONArray로 파싱
         val jsonArray = JSONArray(jsonString)
 
-        var bcode = ""
         var name = ""
+        var bcode = ""
+        var prdNo = ""
         for (index in 0 until jsonArray.length()){
             val jsonObject = jsonArray.getJSONObject(index)
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
                 name = jsonObject.getString("name")
                 bcode = jsonObject.getString("bcode")
-                Log.d(TAG, "setBottomSheetData: bcode = $bcode")
+                prdNo = jsonObject.getString("prdNo")
+                Log.d(TAG, "setBottomSheetData: name=$name , bcode=$bcode, prdNo=$prdNo")
             }
         }
         binding.tvCameraFBsName.text = name
@@ -277,12 +286,10 @@ class CameraFragment : Fragment() {
                         price = element[j+1].text()
                 }
                 Log.d(TAG, "setBottomSheetData: price = $price")
-                binding.tvCameraFBsPrice.text = "${price}"
+                binding.tvCameraFBsPrice.text = price
             }
-
         }
-
-
+        prdInfoViewModel.getAllergen(prdNo)
     }
 
     inner class MyGesture : GestureDetector.OnGestureListener {
