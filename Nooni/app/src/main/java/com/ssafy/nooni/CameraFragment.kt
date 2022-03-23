@@ -28,6 +28,8 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -59,6 +61,7 @@ import com.kakao.sdk.link.rx
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
+import com.ssafy.nooni.Viewmodel.PrdInfoViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -76,6 +79,7 @@ class CameraFragment : Fragment() {
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
 
+    private val prdInfoViewModel: PrdInfoViewModel by viewModels()
     private val mediaUtil = PlayMediaUtil()
 
     private val IMAGE_SIZE = 224
@@ -335,7 +339,10 @@ class CameraFragment : Fragment() {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
+
+        prdInfoViewModel.allergenList.observe(viewLifecycleOwner) {
+            allergyRVAdapter.setData(it)
+        }
     }
 
     private fun setProductData() {
@@ -348,12 +355,14 @@ class CameraFragment : Fragment() {
         val jsonArray = JSONArray(jsonString)
 
         var bcode = ""
+        var prdNo = ""
         for (index in 0 until jsonArray.length()){
             val jsonObject = jsonArray.getJSONObject(index)
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
                 bcode = jsonObject.getString("bcode")
-                Log.d(TAG, "setBottomSheetData: bcode = $bcode")
+//                prdNo = jsonObject.getString("prdNo")
+                Log.d(TAG, "setBottomSheetData: bcode = $bcode, prdNo = $prdNo")
             }
         }
 
@@ -373,12 +382,12 @@ class CameraFragment : Fragment() {
                         price = element[j+1].text()
                 }
                 Log.d(TAG, "setBottomSheetData: price = $price")
-                binding.tvCameraFBsPrice.text = "${price}"
+                binding.tvCameraFBsPrice.text = price
             }
 
         }
 
-
+        prdInfoViewModel.getAllergen(prdNo)
     }
 
     private fun classifyImage(image: Bitmap, originImage: Bitmap) {
