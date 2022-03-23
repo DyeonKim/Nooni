@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Nooni</string>
+    <string name="shared_file">USER_INFO</string>
 </resources>
