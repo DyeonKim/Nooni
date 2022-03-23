@@ -12,6 +12,7 @@ import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
 import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
+import java.lang.StringBuilder
 
 
 class AllergyFragment : Fragment() {
@@ -60,17 +61,19 @@ class AllergyFragment : Fragment() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
 
-        var string: String = "알레르기 정보 화면입니다."
+        var sb = StringBuilder()
+        sb.append(resources.getString(R.string.AllergyFrag))
         if(allergyList?.isEmpty() == true){
-            string += "등록된 알레르기가 없습니다."
+            sb.append(resources.getString(R.string.NoAllergy))
         } else {
-            string += "등록된 알레르기는 "
+            sb.append("등록된 알레르기는 ")
             for(item in allergyList!!){
-                string += "${item}, "
+                sb.append("${item}, ")
             }
-            string += "입니다."
+            sb.append("입니다.")
         }
-        mainActivity.ttsSpeak(string + "수정하시려면 화면을 두 번 누르세요")
+        sb.append(resources.getString(R.string.AllergyChange))
+        mainActivity.ttsSpeak(sb.toString())
     }
 
     private fun setRecyclerView() {
@@ -107,7 +110,6 @@ class AllergyFragment : Fragment() {
         override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            STTUtil.stop()
             startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
             return true
         }
