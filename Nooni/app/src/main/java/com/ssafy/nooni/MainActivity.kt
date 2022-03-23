@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        tts.speak("누니를 종료합니다.", TextToSpeech.QUEUE_FLUSH, null)
+        ttsSpeak(resources.getString(R.string.NooniClose))
         val handler = Handler()
         handler.postDelayed(Runnable {
             tts.shutdown()
