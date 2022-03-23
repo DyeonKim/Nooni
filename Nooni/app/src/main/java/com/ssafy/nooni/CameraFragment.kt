@@ -22,6 +22,8 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -66,7 +68,15 @@ class CameraFragment : Fragment() {
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
 
-    private val prdInfoViewModel: PrdInfoViewModel by viewModels()
+    private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return PrdInfoViewModel(requireContext()) as T
+            }
+
+        }
+    }
+
     private val mediaUtil = PlayMediaUtil()
 
     private val IMAGE_SIZE = 224
@@ -168,6 +178,9 @@ class CameraFragment : Fragment() {
         })
 
         setBottomSheetRecyclerView()
+        prdInfoViewModel.noticeAllergy.observe(viewLifecycleOwner) {
+            binding.tvCameraFBsNoticeAllergy.text = it
+        }
     }
 
 
@@ -348,7 +361,7 @@ class CameraFragment : Fragment() {
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
                 bcode = jsonObject.getString("bcode")
-//                prdNo = jsonObject.getString("prdNo")
+                prdNo = jsonObject.getString("prdNo")
                 Log.d(TAG, "setBottomSheetData: bcode = $bcode, prdNo = $prdNo")
             }
         }
