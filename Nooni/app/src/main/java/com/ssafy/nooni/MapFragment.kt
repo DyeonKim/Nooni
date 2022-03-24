@@ -1,5 +1,6 @@
 package com.ssafy.nooni
 
+import android.Manifest
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -33,6 +34,18 @@ import com.ssafy.nooni.entity.Contact
 import com.ssafy.nooni.ui.SelectDialog
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
+import android.location.LocationManager
+
+import android.content.pm.PackageManager
+
+import androidx.core.app.ActivityCompat
+
+import com.skt.Tmap.TMapPoint
+
+import android.location.LocationListener
+
+
+
 
 
 class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
@@ -90,9 +103,12 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
         setAuth()
         setMap()
+        setLocationManager()
         findCVS()
 
         binding.llTmap.addView(tMapView)
+
+
     }
 
     private fun setAuth(){
@@ -109,6 +125,57 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 //        tMapView.setCompassMode(true)
         tMapView.setSightVisible(true)  // 시야표출 사용 여부
         tMapView.setTrackingMode(true)  // 화면 중심을 단말의 현재 위치로 이동
+
+    }
+
+    private fun setLocationManager(){
+        val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationListener: LocationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                var latitude = 0.0
+                var longitude = 0.0
+                if (location != null) {
+                    latitude = location.latitude
+                    longitude = location.longitude
+                }
+                val tp = TMapPoint(latitude, longitude)
+                Log.d("테스트", tp.toString())
+            }
+
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+            override fun onProviderEnabled(provider: String) {}
+            override fun onProviderDisabled(provider: String) {}
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        locationManager.requestLocationUpdates(
+            LocationManager.NETWORK_PROVIDER,
+            1000,
+            0f,
+            locationListener
+        )
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            1000,
+            0f,
+            locationListener
+        )
 
     }
 
@@ -271,8 +338,10 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
                 Log.d("DOC", "startNavi:node length = ${nodeListPlacemark.length} ")
                 for (i in 0 until nodeListPlacemark.length) {
+
                     val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(i).childNodes
                     for (j in 0 until nodeListPlacemarkItem.length) {
+                        Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
                         if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
                             Log.d("debug", "#$i : ${nodeListPlacemarkItem.item(j).textContent.trim()}")
                             mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
