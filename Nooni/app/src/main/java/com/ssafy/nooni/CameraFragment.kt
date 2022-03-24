@@ -64,7 +64,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import org.tensorflow.lite.support.metadata.schema.Content
+
 import kotlin.concurrent.timer
 
 private const val TAG = "CameraFragment"
