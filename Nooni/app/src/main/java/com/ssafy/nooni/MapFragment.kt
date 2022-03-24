@@ -119,7 +119,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
     private fun setMap(){
         tMapView.zoomLevel =  17
-        tMapView.setIconVisibility(false)
+        tMapView.setIconVisibility(true)
         tMapView.mapType = TMapView.MAPTYPE_STANDARD
         tMapView.setLanguage(TMapView.LANGUAGE_KOREAN)
 //        tMapView.setCompassMode(true)
@@ -139,6 +139,8 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                     longitude = location.longitude
                 }
                 val tp = TMapPoint(latitude, longitude)
+                tMapView.setLocationPoint(longitude, latitude)
+                tMapView.setCenterPoint(longitude, latitude)
                 Log.d("테스트", tp.toString())
             }
 
@@ -164,12 +166,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER,
-            1000,
-            0f,
-            locationListener
-        )
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             1000,
