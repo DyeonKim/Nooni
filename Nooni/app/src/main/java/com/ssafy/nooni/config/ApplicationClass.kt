@@ -2,6 +2,8 @@ package com.ssafy.nooni.config
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.kakao.sdk.common.KakaoSdk
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -15,11 +17,13 @@ class ApplicationClass:Application() {
 
     companion object{
         lateinit var sRetrofit: Retrofit
+        lateinit var storageRef: StorageReference
     }
     override fun onCreate() {
         super.onCreate()
         initRetrofit()
-        KakaoSdk.init(this, "c09ab9ab21d2c70cd982b6dd34ff6126")
+        initKakao()
+        initFirebase()
     }
     fun initRetrofit() {
         val client: OkHttpClient = OkHttpClient.Builder()
@@ -35,5 +39,11 @@ class ApplicationClass:Application() {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+    }
+    fun initKakao() {
+        KakaoSdk.init(this, "c09ab9ab21d2c70cd982b6dd34ff6126")
+    }
+    fun initFirebase() {
+        storageRef = FirebaseStorage.getInstance().reference
     }
 }
