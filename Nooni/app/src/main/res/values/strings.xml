@@ -1,4 +1,76 @@
 <resources>
     <string name="app_name">Nooni</string>
     <string name="firebase_storage_url_head">https://storage.googleapis.com/nooni-a587a.appspot.com/images/</string>
+    <string-array name="CallNooni">
+        <item>누니야</item>
+        <item>눈이야</item>
+        <item>눈이와</item>
+        <item>눈이요</item>
+        <item>누니와</item>
+        <item>누리야</item>
+        <item>누리와</item>
+        <item>은희야</item>
+    </string-array>
+    <string-array name="camera">
+        <item>카메라</item>
+        <item>홈</item>
+    </string-array>
+    <string-array name="contact">
+        <item>연락처</item>
+    </string-array>
+    <string-array name="allergy">
+        <item>알레르기</item>
+        <item>알러지</item>
+    </string-array>
+    <string name="NooniReady">네 말씀해주세요</string>
+    <string name="NooniAgain">다시한번 말씀해주세요</string>
+    <string-array name="yes">
+        <item>네</item>
+        <item>예</item>
+        <item>어</item>
+        <item>그래</item>
+        <item>있어요</item>
+        <item>있음</item>
+        <item>있습니다</item>
+        <item>예스</item>
+    </string-array>
+    <string-array name="no">
+        <item>아니요</item>
+        <item>안이요</item>
+        <item>아니오</item>
+        <item>안이오</item>
+        <item>아니</item>
+        <item>없다</item>
+        <item>없어</item>
+        <item>노</item>
+        <item>없습니다</item>
+        <item>없어요</item>
+    </string-array>
+       <string name="GoBack">이전화면으로 돌아갑니다. </string>
+    <string name="NooniClose">누니를 종료합니다. </string>
+    <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
+
+    <string name="AllergyQuestion">다음 질문에 대답해주세요. </string>
+    <string name="AllergyFinish">알레르기 정보 등록이 완료되었습니다. 이전화면으로돌아갑니다 </string>
+
+    <string name="AllergyFrag">알레르기 정보 화면입니다. </string>
+    <string name="NoAllergy">등록된 알레르기가 없습니다. </string>
+    <string name="AllergyChange">수정하시려면 화면을 두 번 누르세요. </string>
+    <string-array name="allergyList">
+        <item>갑각류</item>
+        <item>견과</item>
+        <item>달걀</item>
+        <item>땅콩</item>
+        <item>밀</item>
+        <item>생선</item>
+        <item>우유</item>
+        <item>조개</item>
+        <item>콩</item>
+    </string-array>
+    <string name="ContactCall"> 님에게 전화를 거시겠습니까?</string>
+    <string name="ContactRemoveAsk"> 님의 연락처를 삭제하시겠습니까?</string>
+    <string name="ContactFrag">연락처 화면입니다.</string>
+    <string name="ContactAddFinish">연락처 등록이 완료되었습니다.</string>
+    <string name="ContactAlreadyAdd">이미 등록되어있는 연락처 입니다.</string>
+    <string name="ContactRemove">연락처가 삭제되었습니다.</string>
 </resources>
