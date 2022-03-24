@@ -62,9 +62,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 resources.getStringArray(R.array.allergy).forEach {
-                    if(resultString.indexOf(it)>-1){
+                    if (resultString.indexOf(it) > -1) {
                         //STTUtil.stop()
-                        startActivity(Intent(this,RegisterAllergyActivity::class.java))
+                        //startActivity(Intent(this,RegisterAllergyActivity::class.java))
+
+                        viewpager.currentItem = 0
                         sttViewModel.setNooni(false)
                         return@observe
                     }
@@ -136,10 +138,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        STTUtil.owner=this
+        STTUtil.owner = this
         STTUtil.STTVM()
         super.onRestart()
     }
+
     override fun onDestroy() {
         if (tts != null) {
             tts.stop()
