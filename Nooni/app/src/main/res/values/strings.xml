@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Nooni</string>
+    <string name="firebase_storage_url_head">https://storage.googleapis.com/nooni-a587a.appspot.com/images/</string>
 </resources>
