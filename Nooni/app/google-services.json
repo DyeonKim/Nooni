@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "478151541875",
+    "project_id": "nooni-a587a",
+    "storage_bucket": "nooni-a587a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478151541875:android:4aa03a8a989bb94ecb5606",
+        "android_client_info": {
+          "package_name": "com.ssafy.nooni"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478151541875-bv54jn0hdtcc693kbho1cvh05jeq8q3h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBL7ktR-32hzeRBCQpa3I611mMA49RKe4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "478151541875-bv54jn0hdtcc693kbho1cvh05jeq8q3h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
