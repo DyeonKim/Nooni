@@ -33,17 +33,6 @@ import org.json.JSONArray
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.nio.ByteBuffer
-import com.kakao.sdk.link.LinkClient
-import com.kakao.sdk.link.rx
-import com.kakao.sdk.template.model.Content
-import com.kakao.sdk.template.model.FeedTemplate
-import com.kakao.sdk.template.model.Link
-import com.ssafy.nooni.util.ImageDetectUtil
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
-import org.tensorflow.lite.support.metadata.schema.Content
 import kotlin.concurrent.timer
 
 
