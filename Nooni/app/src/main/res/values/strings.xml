@@ -49,6 +49,7 @@
     <string name="NooniClose">누니를 종료합니다. </string>
     <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
 
+    <string name="AllergyNotice">나는 %1$s 알레르기가 있다</string>
     <string name="AllergyQuestion">다음 질문에 대답해주세요. </string>
     <string name="AllergyFinish">알레르기 정보 등록이 완료되었습니다. 이전화면으로돌아갑니다 </string>
 

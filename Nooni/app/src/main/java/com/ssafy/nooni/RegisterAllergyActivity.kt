@@ -81,7 +81,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
         sttViewModel.nooni.observe(this) {
 
             if (sttViewModel.nooni.value == false) {
-                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
+                ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
             }
         }
     }
@@ -113,13 +113,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
         if (++cnt >= list.size) save()
         else {
             binding.tvAllergyAType.text = list[cnt]
-            // TODO: 이런식으로 안드로이드 string.xml에서 가져와서 연결하면 tts가 깨짐 도대체 왜???? 
-//            val sb = StringBuilder()
-//            sb.append(resources.getString(R.string.AllergyPrefix))
-//            sb.append(list[cnt])
-//            sb.append(resources.getString(R.string.AllergyPostfix))
-//            ttsSpeak(sb.toString())
-            ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
+            ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
         }
     }
 
