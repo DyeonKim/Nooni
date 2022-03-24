@@ -44,10 +44,10 @@ class RegisterAllergyActivity : AppCompatActivity() {
         STTUtil.STTVM()
         init()
         Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
+
         sttViewModel.stt.observe(this) {
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
             val resultString = sttViewModel.stt.value!!
-
             resources.getStringArray(R.array.yes).forEach {
                 if (resultString.indexOf(it) > -1) {
                     Log.d("tst6", "onCreate: yes")
@@ -64,6 +64,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
             if (noonicnt == 0) {
+                Log.d("tst6", "onCreate: ")
                 if (cnt == 0) {
                     ttsSpeak(resources.getString(R.string.AllergyQuestion))
                 } else {
@@ -84,6 +85,16 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
             }
         }
+
+        //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
+        tts2.setSpeechRate(3f)
+        val handler = Handler()
+        handler.postDelayed(Runnable {
+            sttViewModel.setNooni(true)
+            sttViewModel.setStt(resources.getString(R.string.init))
+        }, 1000)
+        sttViewModel.setStt("")
+        sttViewModel.setStt(resources.getString(R.string.init))
     }
 
     private fun ttsSpeak(text: String) {
