@@ -3,6 +3,7 @@ package com.ssafy.nooni
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
@@ -88,7 +89,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
         //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
         tts2.setSpeechRate(3f)
-        val handler = Handler()
+        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
             sttViewModel.setNooni(true)
             sttViewModel.setStt(resources.getString(R.string.init))
@@ -132,7 +133,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
         sharePrefArrayListUtil.setStringArrayPref(this, "allergies", allergyList)
         Toast.makeText(this, resources.getString(R.string.AllergyFinish), Toast.LENGTH_SHORT).show()
         tts2.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
-        val handler = Handler()
+        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
             tts2.shutdown()
             finish()
@@ -155,7 +156,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         tts2.speak(resources.getString(R.string.GoBack), TextToSpeech.QUEUE_FLUSH, null)
-        val handler = Handler()
+        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
             tts2.shutdown()
             finish()
