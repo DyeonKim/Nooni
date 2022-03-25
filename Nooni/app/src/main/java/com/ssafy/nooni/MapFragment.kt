@@ -107,7 +107,8 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
         binding.llTmap.addView(tMapView)
         binding.btnMapFStop.setOnClickListener {
-            if(mDelayHandler != null) mDelayHandler.removeCallbacks(::sendReq)
+            if(mDelayHandler != null) mDelayHandler.removeCallbacksAndMessages(null)
+            mainActivity.ttsSpeak("길 안내를 종료합니다.")
         }
 
 
