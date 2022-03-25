@@ -16,11 +16,13 @@ import java.lang.StringBuilder
 
 
 class AllergyFragment : Fragment() {
-    lateinit var binding: FragmentAllergyBinding
-    lateinit var allergyRVAdapter: AllergyRVAdapter
-    lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
-    var allergyList: ArrayList<String>? = null
+    private lateinit var binding: FragmentAllergyBinding
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
+
+    var allergyList: ArrayList<String>? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -42,9 +44,10 @@ class AllergyFragment : Fragment() {
     }
 
     private fun init(){
-        var gestureListener = MyGesture()
-        var doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        val gestureListener = MyGesture()
+        val doubleTapListener = MyDoubleGesture()
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
+
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.llAllergyF.setOnTouchListener { v, event ->
             return@setOnTouchListener gestureDetector.onTouchEvent(event)
@@ -84,7 +87,7 @@ class AllergyFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
 
-        if(allergyList?.isEmpty() == true){
+        if(allergyList?.isEmpty() == true) {
             allergyRVAdapter.setData(listOf("없음"))
         } else {
             allergyList?.let { allergyRVAdapter.setData(it) }

@@ -2,7 +2,6 @@ package com.ssafy.nooni.config
 
 import android.app.Application
 import com.google.gson.GsonBuilder
-import androidx.lifecycle.MutableLiveData
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.kakao.sdk.common.KakaoSdk
@@ -22,12 +21,15 @@ class ApplicationClass:Application() {
         lateinit var storageRef: StorageReference
         lateinit var pRetrofit: Retrofit
     }
+
+
     override fun onCreate() {
         super.onCreate()
         initRetrofit()
         initKakao()
         initFirebase()
     }
+
     fun initRetrofit() {
         val gson = GsonBuilder().setLenient().create()
 

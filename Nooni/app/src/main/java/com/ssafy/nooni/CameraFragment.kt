@@ -9,14 +9,12 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
-import androidx.camera.core.impl.ImageCaptureConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -44,15 +42,17 @@ import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 private const val TAG = "CameraFragment"
 
 class CameraFragment : Fragment() {
-    lateinit var binding: FragmentCameraBinding
-    lateinit var allergyRVAdapter: AllergyRVAdapter
+    private lateinit var binding: FragmentCameraBinding
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
     private lateinit var behavior: BottomSheetBehavior<LinearLayout>
 
     private lateinit var mSensorManager: SensorManager
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
+    private lateinit var imageDetectUtil: ImageDetectUtil
 
+    private val mediaUtil = PlayMediaUtil()
     private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -62,11 +62,9 @@ class CameraFragment : Fragment() {
         }
     }
 
-    private val mediaUtil = PlayMediaUtil()
-    private lateinit var imageDetectUtil: ImageDetectUtil
     private var imageCapture: ImageCapture? = null
-
     private var dataId = -1
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -97,15 +95,13 @@ class CameraFragment : Fragment() {
 //            "UTF-8"
 //        )
 //        mediaUtil.start(url)
-
     }
 
-
     private fun init() {
+        val gestureListener = MyGesture()
+        val doubleTapListener = MyDoubleGesture()
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
 
-        var gestureListener = MyGesture()
-        var doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
             return@setOnTouchListener gestureDetector.onTouchEvent(event)
@@ -134,8 +130,7 @@ class CameraFragment : Fragment() {
         }
     }
 
-
-    private fun initSensor(){
+    private fun initSensor() {
         mSensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
