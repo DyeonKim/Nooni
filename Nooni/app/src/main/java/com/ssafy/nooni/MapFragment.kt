@@ -53,6 +53,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
     private lateinit var tMapView: TMapView
     private lateinit var tMapGpsManager: TMapGpsManager
+    private val tMapData = TMapData()
     private var gpsTracker: GpsTracker? = null
     var minDistance = Double.POSITIVE_INFINITY
 
@@ -214,8 +215,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
     //편의점 찾기
     private fun findCVS() {
-        val tMapData = TMapData()
-
         //지도를 내 현재위치로, 지도의 센터포인트를 내 현재위치로
         gpsTracker = GpsTracker(requireContext())
         latitude = gpsTracker!!.getLatitude()
@@ -353,7 +352,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     }
 
     private fun sendReq(){
-        val tMapData = TMapData()
         tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, currentPoint, pointTo,
             FindPathDataAllListenerCallback { document ->
                 val root: Element = document.documentElement
