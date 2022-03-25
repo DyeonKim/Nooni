@@ -23,14 +23,12 @@ import android.graphics.Color
 import android.location.Location
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.widget.Toast
 import com.skt.Tmap.*
 
 import com.ssafy.nooni.util.GpsTracker
 
 import java.lang.Exception
 import com.skt.Tmap.TMapData.TMapPathType
-import com.ssafy.nooni.entity.Contact
 import com.ssafy.nooni.ui.SelectDialog
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
@@ -43,9 +41,8 @@ import androidx.core.app.ActivityCompat
 import com.skt.Tmap.TMapPoint
 
 import android.location.LocationListener
-
-
-
+import android.os.Handler
+import android.os.Looper
 
 
 class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
@@ -61,6 +58,8 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
     private lateinit var pointFrom: TMapPoint
     private lateinit var pointTo: TMapPoint
+
+    var currentPoint: TMapPoint = TMapPoint(0.0, 0.0)
 
     var latitude = 0.0
     var longitude = 0.0
@@ -138,10 +137,10 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                     latitude = location.latitude
                     longitude = location.longitude
                 }
-                val tp = TMapPoint(latitude, longitude)
+                currentPoint = TMapPoint(latitude, longitude)
                 tMapView.setLocationPoint(longitude, latitude)
                 tMapView.setCenterPoint(longitude, latitude)
-                Log.d("테스트", tp.toString())
+                Log.d("테스트", currentPoint.toString())
             }
 
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
@@ -168,6 +167,12 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         }
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
+            1000,
+            0f,
+            locationListener
+        )
+        locationManager.requestLocationUpdates(
+            LocationManager.NETWORK_PROVIDER,
             1000,
             0f,
             locationListener
@@ -326,27 +331,35 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         }
         tMapGpsManager.OpenGps()
 
-        // 이동경로에 대한 description 받아오기
-        val tMapData = TMapData()
-        tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, pointFrom, pointTo,
-            FindPathDataAllListenerCallback { document ->
-                val root: Element = document.documentElement
-                val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
-                Log.d("DOC", "startNavi:node length = ${nodeListPlacemark.length} ")
-                for (i in 0 until nodeListPlacemark.length) {
-
-                    val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(i).childNodes
-                    for (j in 0 until nodeListPlacemarkItem.length) {
-                        Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
-                        if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
-                            Log.d("debug", "#$i : ${nodeListPlacemarkItem.item(j).textContent.trim()}")
-                            mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
-                        }
-                    }
-                }
-            })
+        waitReq()
 
         tMapGpsManager.CloseGps()
     }
 
+    private val mDelayHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
+    private fun waitReq(){
+        mDelayHandler.postDelayed(::sendReq, 5000) // 5초 후에 showGuest 함수를 실행한다.
+    }
+
+    private fun sendReq(){
+        val tMapData = TMapData()
+        tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, currentPoint, pointTo,
+            FindPathDataAllListenerCallback { document ->
+                val root: Element = document.documentElement
+                val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
+                val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(0).childNodes
+                for (j in 0 until nodeListPlacemarkItem.length) {
+                    if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
+                        Log.d("debug", "${nodeListPlacemarkItem.item(j).textContent.trim()}")
+                        mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
+                    }
+                }
+            })
+
+
+        if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
+    }
 }
