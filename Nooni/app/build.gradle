@@ -114,4 +114,7 @@ dependencies {
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:29.2.1')
     implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
+
+    //lottie file
+    implementation 'com.airbnb.android:lottie:3.0.7'
 }
