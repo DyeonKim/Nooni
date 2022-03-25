@@ -27,8 +27,19 @@ class TutorialActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
+                binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
+                binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
+                binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
+
+                when(position) {
+                    0 -> binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                    1 -> binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                    2 -> binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                }
+
             }
         })
+
 
     }
 }
