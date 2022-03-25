@@ -10,7 +10,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.ssafy.nooni.Viewmodel.SttViewModel
+import com.ssafy.nooni.viewmodel.SttViewModel
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil

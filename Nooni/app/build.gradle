@@ -2,7 +2,11 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 }
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
     compileSdk 32
@@ -15,6 +19,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "DATA_PORTAL_SERVICE_KEY", properties['data_portal_service_key']
     }
 
     buildTypes {
@@ -109,4 +115,8 @@ dependencies {
 
     //Joup
     implementation 'org.jsoup:jsoup:1.11.3'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:29.2.1')
+    implementation 'com.google.firebase:firebase-storage-ktx:20.0.0'
 }
