@@ -20,6 +20,7 @@ import androidx.camera.core.impl.ImageCaptureConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -36,6 +37,7 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
+import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 
 
@@ -54,7 +56,7 @@ class CameraFragment : Fragment() {
     private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return PrdInfoViewModel(requireContext()) as T
+                return PrdInfoViewModel(PrdInfoRepository(requireContext())) as T
             }
 
         }
@@ -298,7 +300,7 @@ class CameraFragment : Fragment() {
                 binding.tvCameraFBsPrice.text = price
             }
         }
-        prdInfoViewModel.getAllergen(prdNo)
+        prdInfoViewModel.loadAllergen(prdNo)
     }
 
     inner class MyGesture : GestureDetector.OnGestureListener {
