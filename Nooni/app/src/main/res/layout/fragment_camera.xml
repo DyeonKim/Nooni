@@ -27,10 +27,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_weight="1"
-            android:text="촬영하려면 제품을 손에 들고\n카메라는 제품을 향하게 해주세요\n그리고 화면을 두 번 눌러주세요"
+            android:text="촬영하려면 화면을 두 번 눌러주세요"
             android:textAlignment="center"
             android:textColor="@color/nooni"
             android:textSize="24sp" />
+
 
         <TextView
             android:id="@+id/tv_cameraF_res"
