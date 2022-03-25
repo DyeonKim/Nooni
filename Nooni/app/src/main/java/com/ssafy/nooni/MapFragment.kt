@@ -55,11 +55,8 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     private lateinit var tMapGpsManager: TMapGpsManager
     private val tMapData = TMapData()
     private var gpsTracker: GpsTracker? = null
-    var minDistance = Double.POSITIVE_INFINITY
 
-    private lateinit var pointFrom: TMapPoint
     private lateinit var pointTo: TMapPoint
-
     var currentPoint: TMapPoint = TMapPoint(0.0, 0.0)
 
     var latitude = 0.0
@@ -71,7 +68,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
 
     //마커 핀 이미지
     var bitmap: Bitmap? = null
-    private var tMapPoint: TMapPoint? = null  //현재 위치 포인트
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -108,8 +104,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             if(mDelayHandler != null) mDelayHandler.removeCallbacksAndMessages(null)
             mainActivity.ttsSpeak("길 안내를 종료합니다.")
         }
-
-
     }
 
     private fun setAuth(){
@@ -172,7 +166,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             0f,
             locationListener
         )
-
     }
 
     //원 그리기
@@ -209,7 +202,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         gpsTracker = GpsTracker(requireContext())
         latitude = gpsTracker!!.getLatitude()
         longitude = gpsTracker!!.getLongitude()
-        tMapPoint = TMapPoint(latitude, longitude)
 
         //지도 중심 좌표 조정
         tMapView.setCenterPoint(longitude, latitude, false)
@@ -218,9 +210,10 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         //500m, 100m 원 그리는 메소드
         drawCircle()
 
+        var minDistance = Double.POSITIVE_INFINITY
         var itemInfo = TMapPOIItem()
         //"편의점" 키워드로 검색
-        tMapData.findAroundNamePOI(tMapPoint, "편의점",
+        tMapData.findAroundNamePOI(TMapPoint(latitude, longitude), "편의점",
             FindAroundNamePOIListenerCallback { poiItem ->
                 if (poiItem == null) return@FindAroundNamePOIListenerCallback
                 val tMapPointStart = TMapPoint(latitude, longitude) // 출발지
@@ -251,7 +244,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                     }
                 }
 
-                pointFrom = tMapPointStart
                 if (minDistancePoint != null) {
                     pointTo = minDistancePoint
                 }
@@ -333,25 +325,13 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
                 val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(0).childNodes
                 for (j in 0 until nodeListPlacemarkItem.length) {
-                    Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
+//                    Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
                     if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
                         Log.d("debug", "${nodeListPlacemarkItem.item(j).textContent.trim()}")
                         mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
                     }
                 }
             })
-
-        val minDistancePolyLine = TMapData().findPathDataWithType(
-            TMapPathType.PEDESTRIAN_PATH,
-            currentPoint,
-            pointTo)
-
-        if (minDistancePolyLine != null) {
-            minDistancePolyLine.lineColor = R.color.nooni
-            minDistancePolyLine.outLineColor = R.color.nooni
-            minDistancePolyLine.lineWidth = 5f
-            tMapView.addTMapPath(minDistancePolyLine)
-        }
 
         if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
     }
