@@ -152,6 +152,14 @@ class CameraFragment : Fragment() {
             mAccelerometer,
             SensorManager.SENSOR_DELAY_UI
         )
+
+    }
+
+
+    private fun initData() {
+        dataId = -1
+        binding.tvCameraFBsName.text = ""
+        binding.tvCameraFBsPrice.text = ""
     }
 
     private fun startCamera() {
@@ -241,14 +249,17 @@ class CameraFragment : Fragment() {
         val jsonArray = JSONArray(jsonString)
 
         var bcode = ""
+        var name = ""
         for (index in 0 until jsonArray.length()){
             val jsonObject = jsonArray.getJSONObject(index)
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
+                name = jsonObject.getString("name")
                 bcode = jsonObject.getString("bcode")
                 Log.d(TAG, "setBottomSheetData: bcode = $bcode")
             }
         }
+        binding.tvCameraFBsName.text = name
 
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
         CoroutineScope(Dispatchers.IO).launch {
@@ -356,6 +367,8 @@ class CameraFragment : Fragment() {
                 if(time < 0) {
                     requireActivity().runOnUiThread {
                         imageDetectUtil.evaluateImage()
+                        dataId = imageDetectUtil.dataId
+                        setProductData()
                     }
                     this.cancel()
                 }
@@ -372,12 +385,13 @@ class CameraFragment : Fragment() {
     private fun describeTTS() {
         // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
         // TODO: string.xml에 아직 안넣음
-        var string = "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
+        var string = "${binding.tvCameraFBsName.text.toString()}, 가격 ${binding.tvCameraFBsPrice.text}원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
         mainActivity.ttsSpeak(string)
     }
 
     override fun onPause() {
         mSensorManager.unregisterListener(mShakeUtil)
+        initData()
         super.onPause()
     }
 
