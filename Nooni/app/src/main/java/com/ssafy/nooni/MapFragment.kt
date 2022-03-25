@@ -294,7 +294,11 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                         minDistancePolyLine.lineWidth = 5f
 //                        tMapView.addTMapPolyLine("minDistanceLine", minDistancePolyLine)
                         tMapView.addTMapPath(minDistancePolyLine)
-                        binding.textView5.text = itemInfo.poiName
+                        requireActivity().runOnUiThread {
+                                binding.textView5.text = itemInfo.poiName
+                        }
+//                        binding.textView5.text = itemInfo.poiName
+
 
                         mainActivity.tts.speak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.", TextToSpeech.QUEUE_ADD, null)
                     }
