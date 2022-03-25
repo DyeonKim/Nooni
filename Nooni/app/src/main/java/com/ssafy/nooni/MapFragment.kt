@@ -341,7 +341,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     }
 
     private fun waitReq(){
-        mDelayHandler.postDelayed(::sendReq, 5000) // 5초 후에 showGuest 함수를 실행한다.
+        mDelayHandler.postDelayed(::sendReq, 20000)
     }
 
     private fun sendReq(){
@@ -352,6 +352,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
                 val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(0).childNodes
                 for (j in 0 until nodeListPlacemarkItem.length) {
+                    Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
                     if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
                         Log.d("debug", "${nodeListPlacemarkItem.item(j).textContent.trim()}")
                         mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
