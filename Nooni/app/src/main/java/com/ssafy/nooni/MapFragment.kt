@@ -70,9 +70,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     var radius100 = 100.0 // 100 meters
 
     //마커 핀 이미지
-    var markerItem1: TMapMarkerItem? = null
     var bitmap: Bitmap? = null
-    var bitmap2:Bitmap? = null
     private var tMapPoint: TMapPoint? = null  //현재 위치 포인트
 
     override fun onAttach(context: Context) {
@@ -97,9 +95,8 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bitmap = BitmapFactory.decodeResource(requireContext().resources, R.drawable.ic_baseline_location_on_24)
-        bitmap2 = BitmapFactory.decodeResource(requireContext().resources, R.drawable.icon_marker)
-        bitmap2 = Bitmap.createScaledBitmap(bitmap2!!, 50, 50, false)
+        bitmap = BitmapFactory.decodeResource(requireContext().resources, R.drawable.icon_marker)
+        bitmap = Bitmap.createScaledBitmap(bitmap!!, 50, 50, false)
 
         setAuth()
         setMap()
@@ -161,13 +158,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return
         }
         locationManager.requestLocationUpdates(
@@ -176,12 +166,12 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             0f,
             locationListener
         )
-//        locationManager.requestLocationUpdates(
-//            LocationManager.NETWORK_PROVIDER,
-//            1000,
-//            0f,
-//            locationListener
-//        )
+        locationManager.requestLocationUpdates(
+            LocationManager.NETWORK_PROVIDER,
+            1000,
+            0f,
+            locationListener
+        )
 
     }
 
@@ -220,11 +210,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         latitude = gpsTracker!!.getLatitude()
         longitude = gpsTracker!!.getLongitude()
         tMapPoint = TMapPoint(latitude, longitude)
-        markerItem1 = TMapMarkerItem()
-        markerItem1!!.setIcon(bitmap) //마커핀 이미지 연결
-        markerItem1!!.setPosition(0.5f, 1.0f) //마커핀 위치 조정
-        markerItem1!!.setTMapPoint(tMapPoint) //마커핀 위치 연결
-        tMapView.addMarkerItem("현재 나의 위치", markerItem1)
 
         //지도 중심 좌표 조정
         tMapView.setCenterPoint(longitude, latitude, false)
@@ -240,21 +225,17 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 if (poiItem == null) return@FindAroundNamePOIListenerCallback
                 val tMapPointStart = TMapPoint(latitude, longitude) // 출발지
                 tMapView.removeAllMarkerItem()
-//                var minDistance = Double.POSITIVE_INFINITY
                 var minDistancePoint: TMapPoint? = null
 
-
                 //텍스트 뷰에 넣을 편의점 정보
-//                var itemInfo = TMapPOIItem()
                 for (i in 0 until poiItem.size) {
                     val item = poiItem[i] as TMapPOIItem
                     val distance = item.getDistance(tMapPointStart)
 
-
                     //500m 안에 있는 편의점들 마커핀으로 표시
                     if (distance < minRadius) {
                         val markerItem = TMapMarkerItem()
-                        markerItem.icon = bitmap2
+                        markerItem.icon = bitmap
                         markerItem.setPosition(0.5f, 1.0f)
                         markerItem.tMapPoint = item.poiPoint // 마커의 좌표 지정
                         markerItem.name = item.poiName.toString()
@@ -282,10 +263,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                         minDistancePoint
                     )
 
-                    // //내 위치 마커
-                    markerItem1!!.setTMapPoint(tMapPoint)
-                    tMapView.addMarkerItem("현재 나의 위치", markerItem1)
-
                     //가까운 거리 인식 되면 선 그리고 편의점 정보 텍스트뷰에 올리기
                     if (minDistancePolyLine != null) {
                         minDistancePolyLine.lineColor = R.color.nooni
@@ -296,8 +273,6 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                         requireActivity().runOnUiThread {
                                 binding.textView5.text = itemInfo.poiName
                         }
-//                        binding.textView5.text = itemInfo.poiName
-
 
                         mainActivity.tts.speak("현 위치에서 가장 가까운 편의점은 ${itemInfo.poiName} 이며, 거리는 ${minDistance.toInt()} 미터입니다.", TextToSpeech.QUEUE_ADD, null)
                     }
