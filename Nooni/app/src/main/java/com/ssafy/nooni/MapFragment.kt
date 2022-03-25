@@ -106,6 +106,9 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         findCVS()
 
         binding.llTmap.addView(tMapView)
+        binding.btnMapFStop.setOnClickListener {
+            if(mDelayHandler != null) mDelayHandler.removeCallbacks(::sendReq)
+        }
 
 
     }
@@ -171,12 +174,12 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
             0f,
             locationListener
         )
-        locationManager.requestLocationUpdates(
-            LocationManager.NETWORK_PROVIDER,
-            1000,
-            0f,
-            locationListener
-        )
+//        locationManager.requestLocationUpdates(
+//            LocationManager.NETWORK_PROVIDER,
+//            1000,
+//            0f,
+//            locationListener
+//        )
 
     }
 
@@ -360,6 +363,17 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                 }
             })
 
+        val minDistancePolyLine = TMapData().findPathDataWithType(
+            TMapPathType.PEDESTRIAN_PATH,
+            currentPoint,
+            pointTo)
+
+        if (minDistancePolyLine != null) {
+            minDistancePolyLine.lineColor = R.color.nooni
+            minDistancePolyLine.outLineColor = R.color.nooni
+            minDistancePolyLine.lineWidth = 5f
+            tMapView.addTMapPath(minDistancePolyLine)
+        }
 
         if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
     }
