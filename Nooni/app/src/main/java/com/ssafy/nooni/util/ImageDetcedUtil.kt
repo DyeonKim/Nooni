@@ -47,7 +47,6 @@ class ImageDetectUtil(val context: Context) {
         "페리오46cm쿨민트치약",
         "카카오프렌즈밴드중형"
     )
-
     private lateinit var detectImage: Array<DetectedImage>
 
     val IMAGE_SIZE = 224
@@ -57,6 +56,7 @@ class ImageDetectUtil(val context: Context) {
     private val MIN_DETECT_CNT = 2 // 최소 인식 횟수 만족 조건
     private val SUCCESS_RATE = 80 // ex) 성공률 80% = 80
     var kakaoUtil = KakaoUtil(context)
+    var dataId = 0
 
     fun init() {
         detectImage = Array(classes.size) {
@@ -124,7 +124,7 @@ class ImageDetectUtil(val context: Context) {
         }
 
         Toast.makeText(context, "${String.format("%s: %.1f%%\n", classes[maxPos], detectImage[maxPos].confidence * 100)}", Toast.LENGTH_SHORT).show()
-        
+        dataId = maxPos
         if(detectImage[maxPos].cnt >= MIN_DETECT_CNT && detectImage[maxPos].confidence * 100 >= SUCCESS_RATE) {
             // TODO: tts로 확률 읽어주기 
         } else {
