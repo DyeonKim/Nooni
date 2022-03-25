@@ -338,7 +338,7 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         }
         tMapGpsManager.OpenGps()
 
-        waitReq()
+        sendReq()
 
         tMapGpsManager.CloseGps()
     }
