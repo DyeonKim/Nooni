@@ -50,6 +50,7 @@ import com.kakao.sdk.link.rx
 import com.kakao.sdk.template.model.Content
 import com.kakao.sdk.template.model.FeedTemplate
 import com.kakao.sdk.template.model.Link
+import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -71,7 +72,7 @@ class CameraFragment : Fragment() {
     private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return PrdInfoViewModel(requireContext()) as T
+                return PrdInfoViewModel(PrdInfoRepository(requireContext())) as T
             }
 
         }
