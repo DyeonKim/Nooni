@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
-import android.util.Log
 import android.widget.Toast
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
@@ -16,8 +15,8 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
     private var tts2: TextToSpeech? = null
-    val list = listOf<String>("갑각류", "견과", "달걀", "땅콩", "밀", "생선", "우유", "조개", "콩")
-    val allergyList = ArrayList<String>()
+    private val list = resources.getStringArray(R.array.allergy_names)
+    private val allergyList = ArrayList<String>()
     var cnt = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
