@@ -545,9 +545,13 @@ class CameraFragment : Fragment() {
 
 
         private fun describeTTS() {
-            // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
+            val name  = binding.tvCameraFBsName.text
+            val price = binding.tvCameraFBsPrice.text
+            val allergen = prdInfoViewModel.allergenList.value.toString()
+            val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
+
             var string =
-                "${binding.tvCameraFBsName.text.toString()}, 가격 23000원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
+                "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
             mainActivity.ttsSpeak(string)
         }
 
