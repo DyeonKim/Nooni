@@ -32,6 +32,7 @@
             android:textColor="@color/nooni"
             android:textSize="24sp" />
 
+
         <TextView
             android:id="@+id/tv_cameraF_res"
             android:layout_width="match_parent"

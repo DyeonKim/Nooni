@@ -355,6 +355,7 @@ class CameraFragment : Fragment() {
             imageDetectUtil.init()
             // TODO: tts로 안내하기
             Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
+            mainActivity.ttsSpeak("촬영중입니다.")
 
             for(i in 1..3) {
                 takePicture()
@@ -368,6 +369,8 @@ class CameraFragment : Fragment() {
                     requireActivity().runOnUiThread {
                         imageDetectUtil.evaluateImage()
                         dataId = imageDetectUtil.dataId
+                        var string = "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
+                        mainActivity.ttsSpeak(string)
                         setProductData()
                     }
                     this.cancel()
