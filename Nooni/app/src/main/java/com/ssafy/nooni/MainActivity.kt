@@ -158,7 +158,8 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.CALL_PHONE
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.RECORD_AUDIO
                 )
             )
         ) {
