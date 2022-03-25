@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Nooni</string>
+    <string name="shared_file">USER_INFO</string>
     <string name="firebase_storage_url_head">https://storage.googleapis.com/nooni-a587a.appspot.com/images/</string>
     <string-array name="CallNooni">
         <item>누니야</item>
@@ -56,17 +57,6 @@
     <string name="AllergyFrag">알레르기 정보 화면입니다. </string>
     <string name="NoAllergy">등록된 알레르기가 없습니다. </string>
     <string name="AllergyChange">수정하시려면 화면을 두 번 누르세요. </string>
-    <string-array name="allergyList">
-        <item>갑각류</item>
-        <item>견과</item>
-        <item>달걀</item>
-        <item>땅콩</item>
-        <item>밀</item>
-        <item>생선</item>
-        <item>우유</item>
-        <item>조개</item>
-        <item>콩</item>
-    </string-array>
     <string name="ContactCall"> 님에게 전화를 거시겠습니까?</string>
     <string name="ContactRemoveAsk"> 님의 연락처를 삭제하시겠습니까?</string>
     <string name="ContactFrag">연락처 화면입니다.</string>

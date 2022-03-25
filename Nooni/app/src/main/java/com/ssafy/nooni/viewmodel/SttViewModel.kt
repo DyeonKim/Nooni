@@ -1,4 +1,4 @@
-package com.ssafy.nooni.Viewmodel
+package com.ssafy.nooni.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
