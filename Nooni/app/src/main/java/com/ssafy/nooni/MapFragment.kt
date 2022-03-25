@@ -43,6 +43,9 @@ import com.skt.Tmap.TMapPoint
 import android.location.LocationListener
 import android.os.Handler
 import android.os.Looper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
 
 
 class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
@@ -319,20 +322,21 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
     }
 
     private fun sendReq(){
-        tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, currentPoint, pointTo,
-            FindPathDataAllListenerCallback { document ->
-                val root: Element = document.documentElement
-                val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
-                val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(0).childNodes
-                for (j in 0 until nodeListPlacemarkItem.length) {
+        CoroutineScope(IO).launch {
+            tMapData.findPathDataAllType(TMapPathType.PEDESTRIAN_PATH, currentPoint, pointTo,
+                FindPathDataAllListenerCallback { document ->
+                    val root: Element = document.documentElement
+                    val nodeListPlacemark: NodeList = root.getElementsByTagName("Placemark")
+                    val nodeListPlacemarkItem: NodeList = nodeListPlacemark.item(0).childNodes
+                    for (j in 0 until nodeListPlacemarkItem.length) {
 //                    Log.d("DOC", "${nodeListPlacemarkItem.item(j).nodeName} = ${nodeListPlacemarkItem.item(j).textContent} ")
-                    if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
-                        Log.d("debug", "${nodeListPlacemarkItem.item(j).textContent.trim()}")
-                        mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
+                        if (nodeListPlacemarkItem.item(j).nodeName.equals("description")) {
+                            Log.d("debug", "${nodeListPlacemarkItem.item(j).textContent.trim()}")
+                            mainActivity.ttsSpeak(("${nodeListPlacemarkItem.item(j).textContent.trim()}"))
+                        }
                     }
-                }
-            })
-
+                })
+        }
         if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
     }
 }
