@@ -21,8 +21,8 @@ private const val TAG = "RegisterAllergy"
 class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
+    lateinit var list: Array<String>
     private var tts2: TextToSpeech? = null
-    private val list = resources.getStringArray(R.array.allergy_names)
     private val allergyList = ArrayList<String>()
     var cnt = 0
     var noonicnt = 0
@@ -34,6 +34,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
         binding = ActivityRegisterAllergyBinding.inflate(layoutInflater)
         setContentView(binding.root)
         sharePrefArrayListUtil = SharedPrefArrayListUtil(this)
+        list = resources.getStringArray(R.array.allergy_names)
 
         tts2 = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
