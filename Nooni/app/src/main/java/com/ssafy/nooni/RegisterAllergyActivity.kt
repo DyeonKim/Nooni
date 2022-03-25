@@ -22,8 +22,8 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
     private var tts2: TextToSpeech? = null
-    lateinit var list: Array<String>
-    val allergyList = ArrayList<String>()
+    private val list = resources.getStringArray(R.array.allergy_names)
+    private val allergyList = ArrayList<String>()
     var cnt = 0
     var noonicnt = 0
     private val sttViewModel: SttViewModel by viewModels()
@@ -43,7 +43,6 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
         })
-        list = resources.getStringArray(R.array.allergyList)
         STTUtil.owner = this
         STTUtil.STTVM()
         init()
@@ -145,6 +144,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         tts2?.stop()
         tts2?.shutdown()
     }
