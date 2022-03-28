@@ -21,7 +21,6 @@ class AllergyFragment : Fragment() {
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
 
     private var allergyList: ArrayList<String>? = null
-    private var delay = 0L
 
 
     override fun onAttach(context: Context) {

@@ -111,31 +111,10 @@ class CameraFragment : Fragment() {
         }
 
         mainActivity.onDoubleClick(binding.root) {
-            imageDetectUtil.init()
             // TODO: tts로 안내하기
             Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
             mainActivity.ttsSpeak("촬영중입니다.")
-
-            for (i in 1..3) {
-                takePicture()
-            }
-
-            var time = imageDetectUtil.GIVEN_TIME
-            timer(period = 1000) {
-                time -= 1
-
-                if (time < 0) {
-                    requireActivity().runOnUiThread {
-                        imageDetectUtil.evaluateImage()
-                        dataId = imageDetectUtil.dataId
-                        var string =
-                            "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
-                        mainActivity.ttsSpeak(string)
-                        setProductData()
-                    }
-                    this.cancel()
-                }
-            }
+            classifyProduct()
         }
 
         behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
@@ -230,6 +209,32 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireActivity()))
     }
 
+    private fun classifyProduct() {
+        for(i in 1..imageDetectUtil.CHECK_CNT) {
+            takePicture()
+        }
+
+        var time = imageDetectUtil.GIVEN_TIME
+        timer(period = 1000) {
+            time -= 1
+
+            if(time < 0) {
+                requireActivity().runOnUiThread {
+                    val image = imageDetectUtil.getEvaluatedImage()
+                    if(image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                        val string = "제품은 ${String.format("%s", productUtil.getProductData(image.id).name)}입니다."
+                        mainActivity.ttsSpeak(string)
+                    } else {
+                        mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                        kakaoUtil.sendKakaoLink(image.image!!)
+                    }
+                    setProductData(image.id)
+                }
+                this.cancel()
+            }
+        }
+    }
+
     private fun takePicture() {
         val imageCapture = imageCapture ?: return
 
@@ -276,6 +281,9 @@ class CameraFragment : Fragment() {
     }
 
     private fun setProductData(dataId: Int) {
+        if (dataId < 0)
+            return
+
         val product = productUtil.getProductData(dataId)
         binding.tvCameraFBsName.text = product.name
         binding.tvCameraFRes.text = product.name
