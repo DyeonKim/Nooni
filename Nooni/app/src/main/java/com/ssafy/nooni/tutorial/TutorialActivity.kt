@@ -16,10 +16,11 @@ class TutorialActivity : AppCompatActivity() {
 
 
         val pagerAdapter = TutorialViewPagerAdapter(this)
-        // 3개의 Fragment Add
+        // 4개의 Fragment Add
         pagerAdapter.addFragment(TutorialOneFragment())
         pagerAdapter.addFragment(TutorialTwoFragment())
         pagerAdapter.addFragment(TutorialThreeFragment())
+        pagerAdapter.addFragment(TutorialFourFragment())
         // Adapter
         binding.viewPager.adapter = pagerAdapter
 
@@ -30,15 +31,40 @@ class TutorialActivity : AppCompatActivity() {
                 binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
+                binding.indicator3IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
 
                 when(position) {
-                    0 -> binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
-                    1 -> binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
-                    2 -> binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+
+                    0 -> {
+                        binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.btnTv.text = "다음"
+                    }
+                    1 -> {
+                        binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.btnTv.text = "다음"
+                    }
+                    2 -> {
+                        binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.btnTv.text = "다음"
+                    }
+                    3 -> {
+                        binding.indicator3IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.btnTv.text = "시작하기"
+                    }
                 }
 
             }
         })
+
+        binding.btn.setOnClickListener {
+            var current = binding.viewPager.currentItem
+            if(current  == 0) {
+                //binding.viewPager.setCurrentItem()
+
+            } else {
+
+            }
+        }
 
 
     }
