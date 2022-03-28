@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
+import androidx.camera.core.internal.utils.ImageUtil
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -26,9 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
-import com.ssafy.nooni.util.ImageDetectUtil
-import com.ssafy.nooni.util.PlayMediaUtil
-import com.ssafy.nooni.util.ShakeUtil
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.jsoup.Jsoup
@@ -36,8 +34,9 @@ import org.jsoup.select.Elements
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
+import com.ssafy.nooni.util.*
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
-import android.view.GestureDetector
+
 
 private const val TAG = "CameraFragment"
 
@@ -50,9 +49,18 @@ class CameraFragment : Fragment() {
     private lateinit var mSensorManager: SensorManager
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
-    private lateinit var imageDetectUtil: ImageDetectUtil
+
 
     private val mediaUtil = PlayMediaUtil()
+    private val productUtil = ProductUtil()
+    val imageDetectUtil: ImageDetectUtil by lazy {
+        ImageDetectUtil(requireContext())
+    }
+    val kakaoUtil: KakaoUtil by lazy {
+        KakaoUtil(requireContext())
+    }
+
+
     private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -63,8 +71,6 @@ class CameraFragment : Fragment() {
     }
 
     private var imageCapture: ImageCapture? = null
-    private var dataId = -1
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -83,7 +89,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         init()
         initSensor()
-        initImageDetect()
+        initProductData()
 
         // 아래와 같이 url에서 음성파일 실행할 수 있음
         // TODO: 음성파일 이름 규칙을 만들어야 url 접근이 용이
@@ -98,26 +104,26 @@ class CameraFragment : Fragment() {
     }
 
     private fun init() {
-        val gestureListener = MyGesture()
-        val doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        val gestureDetector = GestureDetector(requireContext(), MyGesture())
 
-
-        gestureDetector.setOnDoubleTapListener(doubleTapListener)
-        binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
-            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        binding.root.setOnTouchListener { view, motionEvent ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(motionEvent)
         }
 
-        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
-        binding.constraintLayoutCameraF.setOnClickListener {}
+        mainActivity.onDoubleClick(binding.root) {
+            // TODO: tts로 안내하기
+            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
+            mainActivity.ttsSpeak("촬영중입니다.")
+            classifyProduct()
+        }
 
         behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     describeTTS()
-                } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
-                    mainActivity.tts.stop()
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    mainActivity.tts!!.stop()
                 }
             }
 
@@ -143,15 +149,15 @@ class CameraFragment : Fragment() {
         })
     }
 
-    private fun initImageDetect() {
-        imageDetectUtil = ImageDetectUtil(requireContext())
+    private fun initProductData() {
+        productUtil.init(requireContext())
     }
 
     override fun onResume() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        mainActivity.tts.setSpeechRate(3f)
+        mainActivity.tts!!.setSpeechRate(2f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(
@@ -168,7 +174,6 @@ class CameraFragment : Fragment() {
     }
 
     private fun initData() {
-        dataId = -1
         binding.tvCameraFBsName.text = ""
         binding.tvCameraFBsPrice.text = ""
     }
@@ -186,7 +191,8 @@ class CameraFragment : Fragment() {
                     it.setSurfaceProvider(binding.previewViewCameraF.surfaceProvider)
                 }
 
-            imageCapture = ImageCapture.Builder().setJpegQuality(75).setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY).build()
+            imageCapture = ImageCapture.Builder().setJpegQuality(75)
+                .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY).build()
 
             //후면 카메라 기본으로 세팅
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -206,6 +212,37 @@ class CameraFragment : Fragment() {
                 Log.d(TAG, "Use case binding failed: ", e)
             }
         }, ContextCompat.getMainExecutor(requireActivity()))
+    }
+
+    private fun classifyProduct() {
+        for (i in 1..imageDetectUtil.CHECK_CNT) {
+            takePicture()
+        }
+
+        var time = imageDetectUtil.GIVEN_TIME
+        timer(period = 1000) {
+            time -= 1
+
+            if (time < 0) {
+                requireActivity().runOnUiThread {
+                    val image = imageDetectUtil.getEvaluatedImage()
+                    if (image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                        val string = "제품은 ${
+                            String.format(
+                                "%s",
+                                productUtil.getProductData(image.id).name
+                            )
+                        }입니다."
+                        mainActivity.ttsSpeak(string)
+                    } else {
+                        mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                        kakaoUtil.sendKakaoLink(image.image!!)
+                    }
+                    setProductData(image.id)
+                }
+                this.cancel()
+            }
+        }
     }
 
     private fun takePicture() {
@@ -231,8 +268,21 @@ class CameraFragment : Fragment() {
                     var rotateMatrix = Matrix()
                     rotateMatrix.postRotate(90.0f)
 
-                    var cropImage = Bitmap.createScaledBitmap(bitmap, imageDetectUtil.IMAGE_SIZE, imageDetectUtil.IMAGE_SIZE, false)
-                    cropImage = Bitmap.createBitmap(cropImage, 0, 0, cropImage.width, cropImage.height, rotateMatrix, false)
+                    var cropImage = Bitmap.createScaledBitmap(
+                        bitmap,
+                        imageDetectUtil.IMAGE_SIZE,
+                        imageDetectUtil.IMAGE_SIZE,
+                        false
+                    )
+                    cropImage = Bitmap.createBitmap(
+                        cropImage,
+                        0,
+                        0,
+                        cropImage.width,
+                        cropImage.height,
+                        rotateMatrix,
+                        false
+                    )
 
                     imageDetectUtil.classifyImage(cropImage)
                     super.onCaptureSuccess(image)
@@ -243,7 +293,7 @@ class CameraFragment : Fragment() {
 
     private fun setBottomSheetRecyclerView() {
         allergyRVAdapter = AllergyRVAdapter()
-        binding.rvCameraFBsAllergy.apply{
+        binding.rvCameraFBsAllergy.apply {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
@@ -253,170 +303,49 @@ class CameraFragment : Fragment() {
         }
     }
 
-    private fun setProductData() {
-        // JSON 파일 열어서 String으로 취득
-        val assetManager = resources.assets
-        val inputStream = assetManager.open("data.json")
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
+    private fun setProductData(dataId: Int) {
+        if (dataId < 0)
+            return
 
-        // JSONArray로 파싱
-        val jsonArray = JSONArray(jsonString)
-
-        var name = ""
-        var bcode = ""
-        var prdNo = ""
-        for (index in 0 until jsonArray.length()){
-            val jsonObject = jsonArray.getJSONObject(index)
-            val id = jsonObject.getString("id")
-            if(id == dataId.toString()) {
-                name = jsonObject.getString("name")
-                bcode = jsonObject.getString("bcode")
-                prdNo = jsonObject.getString("prdNo")
-                Log.d(TAG, "setBottomSheetData: name=$name , bcode=$bcode, prdNo=$prdNo")
-            }
-        }
-        binding.tvCameraFBsName.text = name
-        binding.tvCameraFRes.text = name
+        val product = productUtil.getProductData(dataId)
+        binding.tvCameraFBsName.text = product.name
+        binding.tvCameraFRes.text = product.name
 
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
         CoroutineScope(Dispatchers.IO).launch {
-            val url = "https://www.cvslove.com/product/product_view.asp?pcode=$bcode"
-            val doc = Jsoup.connect(url).timeout(1000*10).get()
+            val url = "https://www.cvslove.com/product/product_view.asp?pcode=${product.bcode}"
+            val doc = Jsoup.connect(url).timeout(1000 * 10).get()
             val contentData: Elements = doc.select("#Table4")
             var price = ""
             Log.d(TAG, "setBottomSheetData: $contentData")
 
-            for(data in contentData) {
+            for (data in contentData) {
                 val element = data.select("td")
-                for(j in 0 until element.size) {
+                for (j in 0 until element.size) {
                     val label = element[j].text()
-                    if(label == "소비자가격")
-                        price = element[j+1].text()
+                    if (label == "소비자가격")
+                        price = element[j + 1].text()
                 }
                 Log.d(TAG, "setBottomSheetData: price = $price")
                 binding.tvCameraFBsPrice.text = price
             }
         }
-        prdInfoViewModel.loadAllergen(prdNo)
+        prdInfoViewModel.loadAllergen(product.prdNo)
 
         binding.llCameraFAfterD.visibility = View.VISIBLE
         binding.llCameraFBeforeD.visibility = View.GONE
+
+        prdInfoViewModel.loadAllergen(product.prdNo)
     }
-
-    fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
-        val angle = getAngle(x1, y1, x2, y2)
-        return Direction.fromAngle(angle)
-    }
-
-    fun getAngle(x1: Float, y1: Float, x2: Float, y2: Float): Double {
-        val rad = Math.atan2((y1 - y2).toDouble(), (x2 - x1).toDouble()) + Math.PI
-        return (rad * 180 / Math.PI + 180) % 360
-    }
-
-    enum class Direction {
-        up, down, left, right;
-
-        companion object {
-            fun fromAngle(angle: Double): Direction {
-                return if (inRange(angle, 45f, 135f)) {
-                    up
-                } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
-                    right
-                } else if (inRange(angle, 225f, 315f)) {
-                    down
-                } else {
-                    left
-                }
-            }
-
-            private fun inRange(angle: Double, init: Float, end: Float): Boolean {
-                return angle >= init && angle < end
-            }
-        }
-    }
-
-    fun onSwipe(direction: Direction?): Boolean {
-        if (direction === Direction.up) {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-        if (direction === Direction.down) {
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-        if(direction === Direction.left) {
-            mainActivity.viewpager.currentItem = 2
-        }
-        if(direction === Direction.right){
-            mainActivity.viewpager.currentItem = 0
-        }
-        return true
-    }
-
-    open inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
-
-        override fun onFling(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
-            p2: Float,
-            p3: Float
-        ): Boolean {
-            var x1 = p0!!.x
-            var y1 = p0!!.y
-
-            var x2 = p1!!.x
-            var y2 = p1!!.y
-
-            var direction = getDirection(x1, y1, x2, y2)
-            return onSwipe(direction)
-        }
-    }
-
-    inner class MyDoubleGesture : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
-            return false
-        }
-
-        override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            imageDetectUtil.init()
-            // TODO: tts로 안내하기
-            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
-            mainActivity.ttsSpeak("촬영중입니다.")
-
-            for(i in 1..3) {
-                takePicture()
-            }
-
-            var time = imageDetectUtil.GIVEN_TIME
-            timer(period = 1000) {
-                time -= 1
-
-                if(time < 0) {
-                    requireActivity().runOnUiThread {
-                        imageDetectUtil.evaluateImage()
-                        dataId = imageDetectUtil.dataId
-                        var string = "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
-                        mainActivity.ttsSpeak(string)
-                        setProductData()
-                    }
-                    this.cancel()
-                }
-            }
-            return true
-        }
-
-        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
-            return false
-        }
-    }
-
 
     private fun describeTTS() {
-        val name  = binding.tvCameraFBsName.text
+        val name = binding.tvCameraFBsName.text
         val price = binding.tvCameraFBsPrice.text
         val allergen = prdInfoViewModel.allergenList.value.toString()
         val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
 
         var string = ""
-        if(binding.llCameraFBeforeD.visibility == View.VISIBLE){
+        if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
             string = resources.getString(R.string.BSBeforeDetection)
         } else {
             string = "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
@@ -430,5 +359,71 @@ class CameraFragment : Fragment() {
         initData()
         super.onPause()
     }
+
+    fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
+        val angle = getAngle(x1, y1, x2, y2)
+        return Direction.fromAngle(angle)
+    }
+
+    fun getAngle(x1: Float, y1: Float, x2: Float, y2: Float): Double {
+        val rad = Math.atan2((y1 - y2).toDouble(), (x2 - x1).toDouble()) + Math.PI
+        return (rad * 180 / Math.PI + 180) % 360
+    }
+
+    fun onSwipe(direction: Direction?): Boolean {
+        if (direction === Direction.up) {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+        if (direction === Direction.down) {
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+        if (direction === Direction.left) {
+            mainActivity.viewpager.currentItem = 2
+        }
+        if (direction === Direction.right) {
+            mainActivity.viewpager.currentItem = 0
+        }
+        return true
+    }
+
+    open inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
+
+        override fun onFling(
+            p0: MotionEvent,
+            p1: MotionEvent,
+            p2: Float,
+            p3: Float
+        ): Boolean {
+            var x1 = p0.x
+            var y1 = p0.y
+
+            var x2 = p1.x
+            var y2 = p1.y
+
+            var direction = getDirection(x1, y1, x2, y2)
+            return onSwipe(direction)
+        }
+    }
 }
 
+enum class Direction {
+    up, down, left, right;
+
+    companion object {
+        fun fromAngle(angle: Double): Direction {
+            return if (inRange(angle, 45f, 135f)) {
+                up
+            } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
+                right
+            } else if (inRange(angle, 225f, 315f)) {
+                down
+            } else {
+                left
+            }
+        }
+
+        private fun inRange(angle: Double, init: Float, end: Float): Boolean {
+            return angle >= init && angle < end
+        }
+    }
+}
