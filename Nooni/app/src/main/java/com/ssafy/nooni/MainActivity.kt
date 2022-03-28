@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var permissionUtil: PermissionUtil
-    private lateinit var viewpager: ViewPager2
+    lateinit var viewpager: ViewPager2
     private val sttViewModel: SttViewModel by viewModels()
     var tts: TextToSpeech? = null
 

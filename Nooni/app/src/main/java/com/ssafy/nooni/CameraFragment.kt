@@ -344,28 +344,6 @@ class CameraFragment : Fragment() {
         return (rad * 180 / Math.PI + 180) % 360
     }
 
-    enum class Direction {
-        up, down, left, right;
-
-        companion object {
-            fun fromAngle(angle: Double): Direction {
-                return if (inRange(angle, 45f, 135f)) {
-                    up
-                } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
-                    right
-                } else if (inRange(angle, 225f, 315f)) {
-                    down
-                } else {
-                    left
-                }
-            }
-
-            private fun inRange(angle: Double, init: Float, end: Float): Boolean {
-                return angle >= init && angle < end
-            }
-        }
-    }
-
     fun onSwipe(direction: Direction?): Boolean {
         if (direction === Direction.up) {
             behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -385,19 +363,41 @@ class CameraFragment : Fragment() {
     open inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
 
         override fun onFling(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
+            p0: MotionEvent,
+            p1: MotionEvent,
             p2: Float,
             p3: Float
         ): Boolean {
-            var x1 = p0!!.x
-            var y1 = p0!!.y
+            var x1 = p0.x
+            var y1 = p0.y
 
-            var x2 = p1!!.x
-            var y2 = p1!!.y
+            var x2 = p1.x
+            var y2 = p1.y
 
             var direction = getDirection(x1, y1, x2, y2)
             return onSwipe(direction)
+        }
+    }
+}
+
+enum class Direction {
+    up, down, left, right;
+
+    companion object {
+        fun fromAngle(angle: Double): Direction {
+            return if (inRange(angle, 45f, 135f)) {
+                up
+            } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
+                right
+            } else if (inRange(angle, 225f, 315f)) {
+                down
+            } else {
+                left
+            }
+        }
+
+        private fun inRange(angle: Double, init: Float, end: Float): Boolean {
+            return angle >= init && angle < end
         }
     }
 }
