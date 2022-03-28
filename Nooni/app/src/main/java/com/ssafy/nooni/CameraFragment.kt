@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
+import androidx.camera.core.internal.utils.ImageUtil
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -26,9 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
-import com.ssafy.nooni.util.ImageDetectUtil
-import com.ssafy.nooni.util.PlayMediaUtil
-import com.ssafy.nooni.util.ShakeUtil
 import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.jsoup.Jsoup
@@ -36,6 +34,7 @@ import org.jsoup.select.Elements
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
+import com.ssafy.nooni.util.*
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 
 
@@ -50,9 +49,18 @@ class CameraFragment : Fragment() {
     private lateinit var mSensorManager: SensorManager
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
-    private lateinit var imageDetectUtil: ImageDetectUtil
+
 
     private val mediaUtil = PlayMediaUtil()
+    private val productUtil = ProductUtil()
+    val imageDetectUtil: ImageDetectUtil by lazy {
+        ImageDetectUtil(requireContext())
+    }
+    val kakaoUtil: KakaoUtil by lazy {
+        KakaoUtil(requireContext())
+    }
+
+
     private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -63,8 +71,6 @@ class CameraFragment : Fragment() {
     }
 
     private var imageCapture: ImageCapture? = null
-    private var dataId = -1
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -83,7 +89,7 @@ class CameraFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         init()
         initSensor()
-        initImageDetect()
+        initProductData()
 
         // 아래와 같이 url에서 음성파일 실행할 수 있음
         // TODO: 음성파일 이름 규칙을 만들어야 url 접근이 용이
@@ -142,8 +148,8 @@ class CameraFragment : Fragment() {
         })
     }
 
-    private fun initImageDetect() {
-        imageDetectUtil = ImageDetectUtil(requireContext())
+    private fun initProductData() {
+        productUtil.init(requireContext())
     }
 
 //    override fun onStart() {
@@ -168,7 +174,6 @@ class CameraFragment : Fragment() {
     }
 
     private fun initData() {
-        dataId = -1
         binding.tvCameraFBsName.text = ""
         binding.tvCameraFBsPrice.text = ""
     }
@@ -253,33 +258,14 @@ class CameraFragment : Fragment() {
         }
     }
 
-    private fun setProductData() {
-        // JSON 파일 열어서 String으로 취득
-        val assetManager = resources.assets
-        val inputStream = assetManager.open("data.json")
-        val jsonString = inputStream.bufferedReader().use { it.readText() }
-
-        // JSONArray로 파싱
-        val jsonArray = JSONArray(jsonString)
-
-        var name = ""
-        var bcode = ""
-        var prdNo = ""
-        for (index in 0 until jsonArray.length()){
-            val jsonObject = jsonArray.getJSONObject(index)
-            val id = jsonObject.getString("id")
-            if(id == dataId.toString()) {
-                name = jsonObject.getString("name")
-                bcode = jsonObject.getString("bcode")
-                prdNo = jsonObject.getString("prdNo")
-                Log.d(TAG, "setBottomSheetData: name=$name , bcode=$bcode, prdNo=$prdNo")
-            }
-        }
-        binding.tvCameraFBsName.text = name
+    private fun setProductData(dataId: Int) {
+        val product = productUtil.getProductData(dataId)
+        binding.tvCameraFBsName.text = product.name
+        binding.tvCameraFRes.text = product.name
 
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
         CoroutineScope(Dispatchers.IO).launch {
-            val url = "https://www.cvslove.com/product/product_view.asp?pcode=$bcode"
+            val url = "https://www.cvslove.com/product/product_view.asp?pcode=${product.bcode}"
             val doc = Jsoup.connect(url).timeout(1000*10).get()
             val contentData: Elements = doc.select("#Table4")
             var price = ""
@@ -296,7 +282,7 @@ class CameraFragment : Fragment() {
                 binding.tvCameraFBsPrice.text = price
             }
         }
-        prdInfoViewModel.loadAllergen(prdNo)
+        prdInfoViewModel.loadAllergen(product.prdNo)
     }
 
     inner class MyGesture : GestureDetector.OnGestureListener {
@@ -366,12 +352,11 @@ class CameraFragment : Fragment() {
         }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            imageDetectUtil.init()
             // TODO: tts로 안내하기
             Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
             mainActivity.ttsSpeak("촬영중입니다.")
 
-            for(i in 1..3) {
+            for(i in 1..imageDetectUtil.CHECK_CNT) {
                 takePicture()
             }
 
@@ -381,11 +366,16 @@ class CameraFragment : Fragment() {
 
                 if(time < 0) {
                     requireActivity().runOnUiThread {
-                        imageDetectUtil.evaluateImage()
-                        dataId = imageDetectUtil.dataId
-                        var string = "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
-                        mainActivity.ttsSpeak(string)
-                        setProductData()
+                        var image = imageDetectUtil.getEvaluatedImage()
+                        if(image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                            var string = "제품은 ${String.format("%s", productUtil.getProductData(image.id).name)}입니다."
+                            mainActivity.ttsSpeak(string)
+                        } else {
+                            mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                            kakaoUtil.sendKakaoLink(image.image!!)
+                        }
+
+                        setProductData(imageDetectUtil.dataId)
                     }
                     this.cancel()
                 }
