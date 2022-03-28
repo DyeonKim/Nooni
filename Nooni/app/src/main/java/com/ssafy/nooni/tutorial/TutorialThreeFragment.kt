@@ -1,5 +1,6 @@
 package com.ssafy.nooni.tutorial
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,6 +12,7 @@ import com.ssafy.nooni.databinding.FragmentTutorialTwoBinding
 
 class TutorialThreeFragment : Fragment() {
     private lateinit var binding: FragmentTutorialThreeBinding
+    private lateinit var tutorialActivity: TutorialActivity
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -18,6 +20,16 @@ class TutorialThreeFragment : Fragment() {
     ): View? {
         binding = FragmentTutorialThreeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        tutorialActivity = context as TutorialActivity
+    }
+
+    override fun onResume() {
+        super.onResume()
+        tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial2))
     }
 
 }
