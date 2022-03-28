@@ -339,4 +339,9 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
         }
         if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
     }
+
+    override fun onPause() {
+        super.onPause()
+        if(mDelayHandler != null) mDelayHandler.removeCallbacksAndMessages(null)
+    }
 }
