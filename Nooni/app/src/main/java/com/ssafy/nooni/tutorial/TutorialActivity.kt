@@ -1,8 +1,10 @@
 package com.ssafy.nooni.tutorial
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.viewpager2.widget.ViewPager2
+import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.databinding.ActivityTutorialBinding
@@ -58,11 +60,12 @@ class TutorialActivity : AppCompatActivity() {
 
         binding.btn.setOnClickListener {
             var current = binding.viewPager.currentItem
-            if(current  == 0) {
-                //binding.viewPager.setCurrentItem()
+            if(current  == 3) {
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+                finish()
 
             } else {
-
+                binding.viewPager.setCurrentItem(current+1, false)
             }
         }
 
