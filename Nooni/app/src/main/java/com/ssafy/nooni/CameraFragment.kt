@@ -412,6 +412,7 @@ class CameraFragment : Fragment() {
 
     override fun onPause() {
         mSensorManager.unregisterListener(mShakeUtil)
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         initData()
         super.onPause()
     }
