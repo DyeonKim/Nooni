@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/nooni"
+    tools:context=".tutorial.TutorialOneFragment"
+    android:id="@+id/tutorial0">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/tutorial_one_lottie"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_one_tv1"
+        app:lottie_fileName="beverage.json"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"/>
+
+    <TextView
+        android:id="@+id/tutorial_one_tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:text="제품은 손에 들고"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_one_tv2"/>
+
+    <TextView
+        android:id="@+id/tutorial_one_tv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:layout_marginBottom="50dp"
+        android:text="카메라는 제품을 향하게 해주세요!"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

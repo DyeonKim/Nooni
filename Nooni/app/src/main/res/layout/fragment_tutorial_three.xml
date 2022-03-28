@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/nooni"
+    tools:context=".tutorial.TutorialThreeFragment"
+    android:id="@+id/tutorial2">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/tutorial_three_lottie"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        android:layout_marginBottom="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_three_tv1"
+        app:lottie_fileName="voice_icon.json"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="true"/>
+
+    <TextView
+        android:id="@+id/tutorial_three_tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:text="음성으로 인식된 제품을 알 수 있어요!"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_three_tv2"/>
+    <TextView
+        android:id="@+id/tutorial_three_tv2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:text="화면을 아래에서 위로 밀어 올리면"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_three_tv3"/>
+
+    <TextView
+        android:id="@+id/tutorial_three_tv3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:text="가격, 알레르기 유발 물질도"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/tutorial_three_tv4"/>
+
+    <TextView
+        android:id="@+id/tutorial_three_tv4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:fontFamily="@font/nanumsquareround_eb"
+        android:textAlignment="center"
+        android:includeFontPadding="false"
+        android:layout_marginBottom="50dp"
+        android:text="알 수 있답니다!"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
