@@ -337,7 +337,12 @@ class MapFragment : Fragment(),TMapGpsManager.onLocationChangedCallback {
                     }
                 })
         }
-        if(currentPoint != pointTo) waitReq() // 코드 실행뒤에 계속해서 반복하도록 작업한다.
+        if(currentPoint == pointTo){
+            mainActivity.ttsSpeak("목적지에 도착했습니다. 길 안내를 종료합니다")
+            mDelayHandler.removeCallbacksAndMessages(null)
+        } else {
+            waitReq()
+        }
     }
 
     override fun onPause() {
