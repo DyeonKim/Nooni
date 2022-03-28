@@ -1,11 +1,15 @@
 package com.ssafy.nooni.tutorial
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
 import com.ssafy.nooni.databinding.FragmentTutorialFourBinding
 
@@ -31,6 +35,13 @@ class TutorialFourFragment : Fragment() {
         super.onResume()
         tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial3))
     }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
+
 
 
 }

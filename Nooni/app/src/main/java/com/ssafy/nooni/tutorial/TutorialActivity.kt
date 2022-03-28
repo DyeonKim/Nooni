@@ -1,9 +1,11 @@
 package com.ssafy.nooni.tutorial
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.widget.Toast
 import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.MainActivity
@@ -16,12 +18,15 @@ import java.util.*
 class TutorialActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTutorialBinding
     lateinit var tts: TextToSpeech
+    var isLastPageScroll = false
+    var counterPageScroll = 0
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTutorialBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        init()
+        initTTS()
         val pagerAdapter = TutorialViewPagerAdapter(this)
         // 4개의 Fragment Add
         pagerAdapter.addFragment(TutorialOneFragment())
@@ -61,6 +66,24 @@ class TutorialActivity : AppCompatActivity() {
                 }
 
             }
+
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                if(position == 3 && positionOffset == 0.0f && !isLastPageScroll) {
+                    if(counterPageScroll != 0) {
+                        isLastPageScroll = true
+                        startActivity(Intent(applicationContext, MainActivity::class.java))
+                    }
+                    counterPageScroll++
+                } else {
+                    counterPageScroll = 0
+                }
+            }
+
         })
 
         binding.btn.setOnClickListener {
@@ -77,7 +100,7 @@ class TutorialActivity : AppCompatActivity() {
 
     }
 
-    private fun init() {
+    private fun initTTS() {
         tts = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
             fun onInit(status: Int) {
@@ -96,6 +119,14 @@ class TutorialActivity : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (tts != null) {
+            tts.stop()
+            tts.shutdown()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         PreferenceManager.getDefaultSharedPreferences(this).edit().apply {
@@ -103,5 +134,9 @@ class TutorialActivity : AppCompatActivity() {
             apply()
         }
 
+        if (tts != null) {
+            tts.stop()
+            tts.shutdown()
+        }
     }
 }
