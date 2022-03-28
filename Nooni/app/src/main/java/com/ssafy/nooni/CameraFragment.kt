@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.constraintlayout.motion.widget.OnSwipe
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
@@ -39,10 +38,6 @@ import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 import android.view.GestureDetector
-
-
-
-
 
 private const val TAG = "CameraFragment"
 
@@ -152,17 +147,10 @@ class CameraFragment : Fragment() {
         imageDetectUtil = ImageDetectUtil(requireContext())
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        Toast.makeText(requireActivity(), "camera onStart called", Toast.LENGTH_SHORT).show()
-//        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
-//    }
-
     override fun onResume() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-//        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
         mainActivity.tts.setSpeechRate(3f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
