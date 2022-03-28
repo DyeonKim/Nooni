@@ -42,7 +42,7 @@
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="50sp"
             android:gravity="center_horizontal"
-            android:text="(삼양) 짱구"
+            tools:text="(삼양) 짱구"
             android:layout_weight="4"
             android:textColor="@color/black"
             android:textSize="50sp" />
@@ -60,19 +60,20 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="40dp"
+        app:behavior_peekHeight="80dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View
-            android:layout_width="80dp"
-            android:layout_height="6dp"
-            android:layout_marginTop="12dp"
+            android:layout_width="100dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="40dp"
             android:background="@drawable/rounded_rectangle" />
 
         <View
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_margin="16dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/logo_line" />
 
         <LinearLayout
