@@ -37,7 +37,7 @@ import java.nio.ByteBuffer
 import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
-import android.view.GestureDetector
+
 
 private const val TAG = "CameraFragment"
 
@@ -100,8 +100,7 @@ class CameraFragment : Fragment() {
     private fun init() {
         val gestureListener = MyGesture()
         val doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
-
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
 
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
@@ -151,7 +150,7 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        mainActivity.tts.setSpeechRate(3f)
+        mainActivity.tts.setSpeechRate(2f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(
