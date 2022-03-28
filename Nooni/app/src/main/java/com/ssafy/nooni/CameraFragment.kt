@@ -160,6 +160,10 @@ class CameraFragment : Fragment() {
             SensorManager.SENSOR_DELAY_UI
         )
 
+        binding.llCameraFAfterD.visibility = View.GONE
+        binding.llCameraFBeforeD.visibility = View.VISIBLE
+        binding.tvCameraFRes.text = resources.getString(R.string.CameraFragBeforeDetection)
+
         mainActivity.viewpager.isUserInputEnabled = false
     }
 
@@ -272,6 +276,7 @@ class CameraFragment : Fragment() {
             }
         }
         binding.tvCameraFBsName.text = name
+        binding.tvCameraFRes.text = name
 
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
         CoroutineScope(Dispatchers.IO).launch {
@@ -293,6 +298,9 @@ class CameraFragment : Fragment() {
             }
         }
         prdInfoViewModel.loadAllergen(prdNo)
+
+        binding.llCameraFAfterD.visibility = View.VISIBLE
+        binding.llCameraFBeforeD.visibility = View.GONE
     }
 
     fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
@@ -407,8 +415,12 @@ class CameraFragment : Fragment() {
         val allergen = prdInfoViewModel.allergenList.value.toString()
         val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
 
-        var string =
-            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+        var string = ""
+        if(binding.llCameraFBeforeD.visibility == View.VISIBLE){
+            string = resources.getString(R.string.BSBeforeDetection)
+        } else {
+            string = "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+        }
         mainActivity.ttsSpeak(string)
     }
 
