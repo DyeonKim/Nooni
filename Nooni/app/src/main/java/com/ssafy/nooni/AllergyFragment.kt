@@ -16,11 +16,12 @@ import java.lang.StringBuilder
 
 class AllergyFragment : Fragment() {
     private lateinit var binding: FragmentAllergyBinding
-    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
 
-    var allergyList: ArrayList<String>? = null
+    private var allergyList: ArrayList<String>? = null
+    private var delay = 0L
 
 
     override fun onAttach(context: Context) {
@@ -42,21 +43,18 @@ class AllergyFragment : Fragment() {
         init()
     }
 
-    private fun init(){
-        val gestureListener = MyGesture()
-        val doubleTapListener = MyDoubleGesture()
-        val gestureDetector = GestureDetector(requireContext(), gestureListener)
-
-        gestureDetector.setOnDoubleTapListener(doubleTapListener)
-        binding.llAllergyF.setOnTouchListener { v, event ->
-            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+    private fun init() {
+        binding.root.setOnClickListener {
+            if (System.currentTimeMillis() > delay) {
+                delay = System.currentTimeMillis() + 200
+                return@setOnClickListener
+            }
+            if (System.currentTimeMillis() <= delay) {
+                startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
+            }
         }
 
         allergyList = sharePrefArrayListUtil.getAllergies()
-
-        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
-        binding.llAllergyF.setOnClickListener{}
-
         setRecyclerView()
     }
 
@@ -92,33 +90,6 @@ class AllergyFragment : Fragment() {
         } else {
             allergyList?.let { allergyRVAdapter.setData(it) }
         }
-    }
-
-    inner class MyGesture: GestureDetector.OnGestureListener {
-        override fun onDown(p0: MotionEvent?): Boolean { return false }
-
-        override fun onShowPress(p0: MotionEvent?) {}
-
-        override fun onSingleTapUp(p0: MotionEvent?): Boolean { return false }
-
-        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
-
-        override fun onLongPress(p0: MotionEvent?) {}
-
-        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
-
-
-    }
-
-    inner class MyDoubleGesture: GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
-
-        override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
-            return true
-        }
-
-        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
     }
 
     override fun onPause() {
