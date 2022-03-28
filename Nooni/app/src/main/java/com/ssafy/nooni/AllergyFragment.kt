@@ -10,18 +10,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
-import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
 import java.lang.StringBuilder
 
 
 class AllergyFragment : Fragment() {
     private lateinit var binding: FragmentAllergyBinding
-    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
 
-    var allergyList: ArrayList<String>? = null
+    private var allergyList: ArrayList<String>? = null
 
 
     override fun onAttach(context: Context) {
@@ -43,21 +42,12 @@ class AllergyFragment : Fragment() {
         init()
     }
 
-    private fun init(){
-        val gestureListener = MyGesture()
-        val doubleTapListener = MyDoubleGesture()
-        val gestureDetector = GestureDetector(requireContext(), gestureListener)
-
-        gestureDetector.setOnDoubleTapListener(doubleTapListener)
-        binding.llAllergyF.setOnTouchListener { v, event ->
-            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+    private fun init() {
+        mainActivity.onDoubleClick(binding.root) {
+            startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
         }
 
         allergyList = sharePrefArrayListUtil.getAllergies()
-
-        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
-        binding.llAllergyF.setOnClickListener{}
-
         setRecyclerView()
     }
 
@@ -66,14 +56,14 @@ class AllergyFragment : Fragment() {
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
         mainActivity.viewpager.isUserInputEnabled = true
 
-        var sb = StringBuilder()
+        val sb = StringBuilder()
         sb.append(resources.getString(R.string.AllergyFrag))
         if(allergyList?.isEmpty() == true){
             sb.append(resources.getString(R.string.NoAllergy))
         } else {
-            sb.append("등록된 알레르기는 ")
+            sb.append("등록된 알레르기는.\n")
             for(item in allergyList!!){
-                sb.append("${item}, ")
+                sb.append("${item}.\n")
             }
             sb.append("입니다.")
         }
@@ -95,35 +85,8 @@ class AllergyFragment : Fragment() {
         }
     }
 
-    inner class MyGesture: GestureDetector.OnGestureListener {
-        override fun onDown(p0: MotionEvent?): Boolean { return false }
-
-        override fun onShowPress(p0: MotionEvent?) {}
-
-        override fun onSingleTapUp(p0: MotionEvent?): Boolean { return false }
-
-        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
-
-        override fun onLongPress(p0: MotionEvent?) {}
-
-        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean { return false }
-
-
-    }
-
-    inner class MyDoubleGesture: GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean { return false }
-
-        override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
-            return true
-        }
-
-        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean { return false }
-    }
-
     override fun onPause() {
         super.onPause()
-        mainActivity.tts.stop()
+        mainActivity.tts!!.stop()
     }
 }

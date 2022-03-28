@@ -9,20 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.entity.Contact
 import de.hdodenhof.circleimageview.CircleImageView
 import android.graphics.Bitmap
-
 import android.graphics.BitmapFactory
-
 import android.content.ContentUris
-
 import android.content.ContentResolver
 import android.util.Log
 import java.lang.Exception
 import android.os.Build
-
 import android.graphics.drawable.shapes.OvalShape
-
 import android.graphics.drawable.ShapeDrawable
-
 import android.content.Context
 import com.ssafy.nooni.R
 
@@ -107,25 +101,25 @@ class ContactsRVAdapter(context: Context) : RecyclerView.Adapter<ContactsRVAdapt
             c!!.close()
         }
         if (photoBytes != null) {
-            return resizingBitmap(BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size))
+            return resizeBitmap(BitmapFactory.decodeByteArray(photoBytes, 0, photoBytes.size))
         } else Log.d("<<CONTACT_PHOTO>>", "second try also failed")
         return null
     }
 
-    fun resizingBitmap(oBitmap: Bitmap?): Bitmap? {
+    private fun resizeBitmap(oBitmap: Bitmap?): Bitmap? {
         if (oBitmap == null) {
             return null
         }
         var width = oBitmap.width.toFloat()
         var height = oBitmap.height.toFloat()
-        val resizing_size = 120f
+        val resizingSize = 120f
         var rBitmap: Bitmap? = null
-        if (width > resizing_size) {
-            val fScale = (resizing_size / (width / 100))
+        if (width > resizingSize) {
+            val fScale = (resizingSize / (width / 100))
             width *= fScale / 100
             height *= fScale / 100
-        } else if (height > resizing_size) {
-            val fScale = (resizing_size / (height / 100))
+        } else if (height > resizingSize) {
+            val fScale = (resizingSize / (height / 100))
             width *= fScale / 100
             height *= fScale / 100
         }
@@ -137,7 +131,7 @@ class ContactsRVAdapter(context: Context) : RecyclerView.Adapter<ContactsRVAdapt
         fun onClick(contact: Contact)
     }
 
-    interface  ItemLongClickListener {
+    interface ItemLongClickListener {
         fun onClick(contact: Contact)
     }
 

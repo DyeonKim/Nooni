@@ -36,7 +36,7 @@ import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.util.*
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
-import android.view.GestureDetector
+
 
 private const val TAG = "CameraFragment"
 
@@ -104,18 +104,18 @@ class CameraFragment : Fragment() {
     }
 
     private fun init() {
-        val gestureListener = MyGesture()
-        val doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        val gestureDetector = GestureDetector(requireContext(), MyGesture())
 
-
-        gestureDetector.setOnDoubleTapListener(doubleTapListener)
-        binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
-            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        binding.root.setOnTouchListener { view, motionEvent ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(motionEvent)
         }
 
-        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
-        binding.constraintLayoutCameraF.setOnClickListener {}
+        mainActivity.onDoubleClick(binding.root) {
+            // TODO: tts로 안내하기
+            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
+            mainActivity.ttsSpeak("촬영중입니다.")
+            classifyProduct()
+        }
 
         behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
@@ -123,7 +123,7 @@ class CameraFragment : Fragment() {
                 if(newState == BottomSheetBehavior.STATE_EXPANDED){
                     describeTTS()
                 } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
-                    mainActivity.tts.stop()
+                    mainActivity.tts!!.stop()
                 }
             }
 
@@ -157,7 +157,7 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        mainActivity.tts.setSpeechRate(3f)
+        mainActivity.tts!!.setSpeechRate(2f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(
@@ -209,6 +209,32 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireActivity()))
     }
 
+    private fun classifyProduct() {
+        for(i in 1..imageDetectUtil.CHECK_CNT) {
+            takePicture()
+        }
+
+        var time = imageDetectUtil.GIVEN_TIME
+        timer(period = 1000) {
+            time -= 1
+
+            if(time < 0) {
+                requireActivity().runOnUiThread {
+                    val image = imageDetectUtil.getEvaluatedImage()
+                    if(image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                        val string = "제품은 ${String.format("%s", productUtil.getProductData(image.id).name)}입니다."
+                        mainActivity.ttsSpeak(string)
+                    } else {
+                        mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                        kakaoUtil.sendKakaoLink(image.image!!)
+                    }
+                    setProductData(image.id)
+                }
+                this.cancel()
+            }
+        }
+    }
+
     private fun takePicture() {
         val imageCapture = imageCapture ?: return
 
@@ -255,6 +281,9 @@ class CameraFragment : Fragment() {
     }
 
     private fun setProductData(dataId: Int) {
+        if (dataId < 0)
+            return
+
         val product = productUtil.getProductData(dataId)
         binding.tvCameraFBsName.text = product.name
         binding.tvCameraFRes.text = product.name
@@ -281,6 +310,24 @@ class CameraFragment : Fragment() {
         prdInfoViewModel.loadAllergen(product.prdNo)
     }
 
+    private fun describeTTS() {
+        val name  = binding.tvCameraFBsName.text
+        val price = binding.tvCameraFBsPrice.text
+        val allergen = prdInfoViewModel.allergenList.value.toString()
+        val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
+
+        var string =
+            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+        mainActivity.ttsSpeak(string)
+    }
+
+    override fun onPause() {
+        mSensorManager.unregisterListener(mShakeUtil)
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        initData()
+        super.onPause()
+    }
+
     fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
         val angle = getAngle(x1, y1, x2, y2)
         return Direction.fromAngle(angle)
@@ -289,28 +336,6 @@ class CameraFragment : Fragment() {
     fun getAngle(x1: Float, y1: Float, x2: Float, y2: Float): Double {
         val rad = Math.atan2((y1 - y2).toDouble(), (x2 - x1).toDouble()) + Math.PI
         return (rad * 180 / Math.PI + 180) % 360
-    }
-
-    enum class Direction {
-        up, down, left, right;
-
-        companion object {
-            fun fromAngle(angle: Double): Direction {
-                return if (inRange(angle, 45f, 135f)) {
-                    up
-                } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
-                    right
-                } else if (inRange(angle, 225f, 315f)) {
-                    down
-                } else {
-                    left
-                }
-            }
-
-            private fun inRange(angle: Double, init: Float, end: Float): Boolean {
-                return angle >= init && angle < end
-            }
-        }
     }
 
     fun onSwipe(direction: Direction?): Boolean {
@@ -332,81 +357,42 @@ class CameraFragment : Fragment() {
     open inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
 
         override fun onFling(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
+            p0: MotionEvent,
+            p1: MotionEvent,
             p2: Float,
             p3: Float
         ): Boolean {
-            var x1 = p0!!.x
-            var y1 = p0!!.y
+            var x1 = p0.x
+            var y1 = p0.y
 
-            var x2 = p1!!.x
-            var y2 = p1!!.y
+            var x2 = p1.x
+            var y2 = p1.y
 
             var direction = getDirection(x1, y1, x2, y2)
             return onSwipe(direction)
         }
     }
+}
 
-    inner class MyDoubleGesture : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
-            return false
-        }
+enum class Direction {
+    up, down, left, right;
 
-        override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            // TODO: tts로 안내하기
-            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
-            mainActivity.ttsSpeak("촬영중입니다.")
-
-            for(i in 1..imageDetectUtil.CHECK_CNT) {
-                takePicture()
+    companion object {
+        fun fromAngle(angle: Double): Direction {
+            return if (inRange(angle, 45f, 135f)) {
+                up
+            } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
+                right
+            } else if (inRange(angle, 225f, 315f)) {
+                down
+            } else {
+                left
             }
-
-            var time = imageDetectUtil.GIVEN_TIME
-            timer(period = 1000) {
-                time -= 1
-
-                if(time < 0) {
-                    requireActivity().runOnUiThread {
-                        var image = imageDetectUtil.getEvaluatedImage()
-                        if(image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
-                            var string = "제품은 ${String.format("%s", productUtil.getProductData(image.id).name)}입니다."
-                            mainActivity.ttsSpeak(string)
-                        } else {
-                            mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
-                            kakaoUtil.sendKakaoLink(image.image!!)
-                        }
-
-                        setProductData(imageDetectUtil.dataId)
-                    }
-                    this.cancel()
-                }
-            }
-            return true
         }
 
-        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
-            return false
+        private fun inRange(angle: Double, init: Float, end: Float): Boolean {
+            return angle >= init && angle < end
         }
-    }
-
-
-    private fun describeTTS() {
-        val name  = binding.tvCameraFBsName.text
-        val price = binding.tvCameraFBsPrice.text
-        val allergen = prdInfoViewModel.allergenList.value.toString()
-        val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
-
-        var string =
-            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
-        mainActivity.ttsSpeak(string)
-    }
-
-    override fun onPause() {
-        mSensorManager.unregisterListener(mShakeUtil)
-        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        initData()
-        super.onPause()
     }
 }
 
