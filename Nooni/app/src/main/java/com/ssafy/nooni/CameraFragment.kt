@@ -171,6 +171,8 @@ class CameraFragment : Fragment() {
             mAccelerometer,
             SensorManager.SENSOR_DELAY_UI
         )
+
+        mainActivity.viewpager.isUserInputEnabled = false
     }
 
     private fun initData() {
@@ -343,6 +345,12 @@ class CameraFragment : Fragment() {
         }
         if (direction === Direction.down) {
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+        if(direction === Direction.left) {
+            mainActivity.viewpager.currentItem = 2
+        }
+        if(direction === Direction.right){
+            mainActivity.viewpager.currentItem = 0
         }
         return true
     }

@@ -64,6 +64,7 @@ class AllergyFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
+        mainActivity.viewpager.isUserInputEnabled = true
 
         var sb = StringBuilder()
         sb.append(resources.getString(R.string.AllergyFrag))

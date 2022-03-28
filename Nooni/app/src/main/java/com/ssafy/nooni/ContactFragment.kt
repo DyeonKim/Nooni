@@ -82,6 +82,7 @@ class ContactFragment : Fragment() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "연락처"
         mainActivity.ttsSpeak(resources.getString(R.string.ContactFrag))
+        mainActivity.viewpager.isUserInputEnabled = true
     }
 
     private fun setRecyclerView() {
