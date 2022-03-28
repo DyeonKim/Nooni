@@ -16,15 +16,18 @@ import java.lang.StringBuilder
 
 
 class AllergyFragment : Fragment() {
-    lateinit var binding: FragmentAllergyBinding
-    lateinit var allergyRVAdapter: AllergyRVAdapter
-    var sharePrefArrayListUtil = SharedPrefArrayListUtil()
-    var allergyList: ArrayList<String>? = null
+    private lateinit var binding: FragmentAllergyBinding
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
+    private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
+
+    var allergyList: ArrayList<String>? = null
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
+        sharePrefArrayListUtil = SharedPrefArrayListUtil(context)
     }
 
     override fun onCreateView(
@@ -41,15 +44,16 @@ class AllergyFragment : Fragment() {
     }
 
     private fun init(){
-        var gestureListener = MyGesture()
-        var doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+        val gestureListener = MyGesture()
+        val doubleTapListener = MyDoubleGesture()
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
+
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.llAllergyF.setOnTouchListener { v, event ->
             return@setOnTouchListener gestureDetector.onTouchEvent(event)
         }
 
-        allergyList = sharePrefArrayListUtil.getStringArrayPref(requireContext(), "allergies")
+        allergyList = sharePrefArrayListUtil.getAllergies()
 
         // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
         binding.llAllergyF.setOnClickListener{}
@@ -83,7 +87,7 @@ class AllergyFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
 
-        if(allergyList?.isEmpty() == true){
+        if(allergyList?.isEmpty() == true) {
             allergyRVAdapter.setData(listOf("없음"))
         } else {
             allergyList?.let { allergyRVAdapter.setData(it) }

@@ -7,13 +7,10 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
-import android.view.View
-import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.ssafy.nooni.MainActivity
-import com.ssafy.nooni.Viewmodel.SttViewModel
-import kotlin.properties.ReadOnlyProperty
+import com.ssafy.nooni.viewmodel.SttViewModel
+
 
 object STTUtil {
     var owner:ViewModelStoreOwner? = null

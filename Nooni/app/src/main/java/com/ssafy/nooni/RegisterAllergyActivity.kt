@@ -3,12 +3,13 @@ package com.ssafy.nooni
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.ssafy.nooni.Viewmodel.SttViewModel
+import com.ssafy.nooni.viewmodel.SttViewModel
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
@@ -20,34 +21,38 @@ private const val TAG = "RegisterAllergy"
 
 class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
-    private lateinit var tts2: TextToSpeech
-    var sharePrefArrayListUtil = SharedPrefArrayListUtil()
+    private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
     lateinit var list: Array<String>
-    val allergyList = ArrayList<String>()
+    private var tts2: TextToSpeech? = null
+    private val allergyList = ArrayList<String>()
     var cnt = 0
     var noonicnt = 0
     private val sttViewModel: SttViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterAllergyBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        sharePrefArrayListUtil = SharedPrefArrayListUtil(this)
+        list = resources.getStringArray(R.array.allergy_names)
+
         tts2 = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
             fun onInit(status: Int) {
                 if (status != ERROR) {
-                    tts2.language = Locale.KOREA
+                    tts2?.language = Locale.KOREA
                 }
             }
         })
-        list = resources.getStringArray(R.array.allergyList)
         STTUtil.owner = this
         STTUtil.STTVM()
         init()
         Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
+
         sttViewModel.stt.observe(this) {
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
             val resultString = sttViewModel.stt.value!!
-
             resources.getStringArray(R.array.yes).forEach {
                 if (resultString.indexOf(it) > -1) {
                     Log.d("tst6", "onCreate: yes")
@@ -64,6 +69,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
             if (noonicnt == 0) {
+                Log.d("tst6", "onCreate: ")
                 if (cnt == 0) {
                     ttsSpeak(resources.getString(R.string.AllergyQuestion))
                 } else {
@@ -81,16 +87,26 @@ class RegisterAllergyActivity : AppCompatActivity() {
         sttViewModel.nooni.observe(this) {
 
             if (sttViewModel.nooni.value == false) {
-                ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
+                ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
             }
         }
+
+        //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
+        tts2?.setSpeechRate(3f)
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(Runnable {
+            sttViewModel.setNooni(true)
+            sttViewModel.setStt(resources.getString(R.string.init))
+        }, 1000)
+        sttViewModel.setStt("")
+        sttViewModel.setStt(resources.getString(R.string.init))
     }
 
     private fun ttsSpeak(text: String) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            tts2.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
-            tts2.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 
@@ -106,30 +122,23 @@ class RegisterAllergyActivity : AppCompatActivity() {
             allergyList.add(list[cnt])
             allergyNext()
         }
-
     }
 
     private fun allergyNext() {
         if (++cnt >= list.size) save()
         else {
             binding.tvAllergyAType.text = list[cnt]
-            // TODO: 이런식으로 안드로이드 string.xml에서 가져와서 연결하면 tts가 깨짐 도대체 왜???? 
-//            val sb = StringBuilder()
-//            sb.append(resources.getString(R.string.AllergyPrefix))
-//            sb.append(list[cnt])
-//            sb.append(resources.getString(R.string.AllergyPostfix))
-//            ttsSpeak(sb.toString())
-            ttsSpeak("나는 " + list[cnt] + " 알레르기가 있다")
+            ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
         }
     }
 
     private fun save() {
-        sharePrefArrayListUtil.setStringArrayPref(this, "allergies", allergyList)
+        sharePrefArrayListUtil.setAllergies(allergyList)
         Toast.makeText(this, resources.getString(R.string.AllergyFinish), Toast.LENGTH_SHORT).show()
-        tts2.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
-        val handler = Handler()
+        tts2?.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
-            tts2.shutdown()
+            tts2?.shutdown()
             finish()
         }, 2000)
     }
@@ -142,17 +151,17 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (tts2 != null) {
-            tts2.stop()
-            tts2.shutdown()
-        }
+
+        tts2?.stop()
+        tts2?.shutdown()
     }
 
     override fun onBackPressed() {
-        tts2.speak(resources.getString(R.string.GoBack), TextToSpeech.QUEUE_FLUSH, null)
-        val handler = Handler()
+
+        tts2?.speak(resources.getString(R.string.GoBack), TextToSpeech.QUEUE_FLUSH, null)
+        val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
-            tts2.shutdown()
+            tts2?.shutdown()
             finish()
         }, 1600)
     }

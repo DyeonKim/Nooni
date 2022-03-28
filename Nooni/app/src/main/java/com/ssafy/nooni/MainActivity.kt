@@ -10,7 +10,7 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.ssafy.nooni.Viewmodel.SttViewModel
+import com.ssafy.nooni.viewmodel.SttViewModel
 import com.ssafy.nooni.adapter.ViewpagerFragmentAdapter
 import com.ssafy.nooni.databinding.ActivityMainBinding
 import com.ssafy.nooni.util.PermissionUtil
@@ -62,9 +62,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 resources.getStringArray(R.array.allergy).forEach {
-                    if(resultString.indexOf(it)>-1){
+                    if (resultString.indexOf(it) > -1) {
                         //STTUtil.stop()
-                        startActivity(Intent(this,RegisterAllergyActivity::class.java))
+                        //startActivity(Intent(this,RegisterAllergyActivity::class.java))
+
+                        viewpager.currentItem = 0
                         sttViewModel.setNooni(false)
                         return@observe
                     }
@@ -136,10 +138,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onRestart() {
-        STTUtil.owner=this
+        STTUtil.owner = this
         STTUtil.STTVM()
         super.onRestart()
     }
+
     override fun onDestroy() {
         if (tts != null) {
             tts.stop()
@@ -155,7 +158,8 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA,
                     Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.CALL_PHONE
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.RECORD_AUDIO
                 )
             )
         ) {

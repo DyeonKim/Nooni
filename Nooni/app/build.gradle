@@ -5,6 +5,9 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     compileSdk 32
 
@@ -16,6 +19,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "DATA_PORTAL_SERVICE_KEY", properties['data_portal_service_key']
     }
 
     buildTypes {

@@ -9,16 +9,17 @@ import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
-import androidx.camera.core.impl.ImageCaptureConfig
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,25 +35,36 @@ import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.nio.ByteBuffer
 import kotlin.concurrent.timer
+import com.ssafy.nooni.repository.PrdInfoRepository
+import com.ssafy.nooni.viewmodel.PrdInfoViewModel
 
 
 private const val TAG = "CameraFragment"
 
 class CameraFragment : Fragment() {
-    lateinit var binding: FragmentCameraBinding
-    lateinit var allergyRVAdapter: AllergyRVAdapter
+    private lateinit var binding: FragmentCameraBinding
+    private lateinit var allergyRVAdapter: AllergyRVAdapter
     private lateinit var mainActivity: MainActivity
     private lateinit var behavior: BottomSheetBehavior<LinearLayout>
 
     private lateinit var mSensorManager: SensorManager
     private lateinit var mAccelerometer: Sensor
     private lateinit var mShakeUtil: ShakeUtil
+    private lateinit var imageDetectUtil: ImageDetectUtil
 
     private val mediaUtil = PlayMediaUtil()
-    private lateinit var imageDetectUtil: ImageDetectUtil
-    private var imageCapture: ImageCapture? = null
+    private val prdInfoViewModel by viewModels<PrdInfoViewModel> {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return PrdInfoViewModel(PrdInfoRepository(requireContext())) as T
+            }
 
+        }
+    }
+
+    private var imageCapture: ImageCapture? = null
     private var dataId = -1
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -83,15 +95,13 @@ class CameraFragment : Fragment() {
 //            "UTF-8"
 //        )
 //        mediaUtil.start(url)
-
     }
 
-
     private fun init() {
+        val gestureListener = MyGesture()
+        val doubleTapListener = MyDoubleGesture()
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
 
-        var gestureListener = MyGesture()
-        var doubleTapListener = MyDoubleGesture()
-        var gestureDetector = GestureDetector(requireContext(), gestureListener)
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
             return@setOnTouchListener gestureDetector.onTouchEvent(event)
@@ -115,10 +125,12 @@ class CameraFragment : Fragment() {
         })
 
         setBottomSheetRecyclerView()
+        prdInfoViewModel.noticeAllergy.observe(viewLifecycleOwner) {
+            binding.tvCameraFBsNoticeAllergy.text = it
+        }
     }
 
-
-    private fun initSensor(){
+    private fun initSensor() {
         mSensorManager = requireContext().getSystemService(Context.SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
@@ -145,6 +157,7 @@ class CameraFragment : Fragment() {
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
 //        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
+        mainActivity.tts.setSpeechRate(3f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(
@@ -152,9 +165,7 @@ class CameraFragment : Fragment() {
             mAccelerometer,
             SensorManager.SENSOR_DELAY_UI
         )
-
     }
-
 
     private fun initData() {
         dataId = -1
@@ -236,7 +247,10 @@ class CameraFragment : Fragment() {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        allergyRVAdapter.setData(listOf("밀", "우유", "콩"))
+
+        prdInfoViewModel.allergenList.observe(viewLifecycleOwner) {
+            allergyRVAdapter.setData(it)
+        }
     }
 
     private fun setProductData() {
@@ -248,15 +262,17 @@ class CameraFragment : Fragment() {
         // JSONArray로 파싱
         val jsonArray = JSONArray(jsonString)
 
-        var bcode = ""
         var name = ""
+        var bcode = ""
+        var prdNo = ""
         for (index in 0 until jsonArray.length()){
             val jsonObject = jsonArray.getJSONObject(index)
             val id = jsonObject.getString("id")
             if(id == dataId.toString()) {
                 name = jsonObject.getString("name")
                 bcode = jsonObject.getString("bcode")
-                Log.d(TAG, "setBottomSheetData: bcode = $bcode")
+                prdNo = jsonObject.getString("prdNo")
+                Log.d(TAG, "setBottomSheetData: name=$name , bcode=$bcode, prdNo=$prdNo")
             }
         }
         binding.tvCameraFBsName.text = name
@@ -277,12 +293,10 @@ class CameraFragment : Fragment() {
                         price = element[j+1].text()
                 }
                 Log.d(TAG, "setBottomSheetData: price = $price")
-                binding.tvCameraFBsPrice.text = "${price}"
+                binding.tvCameraFBsPrice.text = price
             }
-
         }
-
-
+        prdInfoViewModel.loadAllergen(prdNo)
     }
 
     inner class MyGesture : GestureDetector.OnGestureListener {
@@ -386,9 +400,13 @@ class CameraFragment : Fragment() {
 
 
     private fun describeTTS() {
-        // TODO : 추후 상품 인식 기능 넣어서 상품 정보 가져올 경우, 가져온 정보에 따라 출력할 문자열 가공 필요
-        // TODO: string.xml에 아직 안넣음
-        var string = "${binding.tvCameraFBsName.text.toString()}, 가격 ${binding.tvCameraFBsPrice.text}원, 알레르기 유발성분 밀, 우유, 콩,  320 칼로리"
+        val name  = binding.tvCameraFBsName.text
+        val price = binding.tvCameraFBsPrice.text
+        val allergen = prdInfoViewModel.allergenList.value.toString()
+        val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
+
+        var string =
+            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
         mainActivity.ttsSpeak(string)
     }
 
@@ -397,6 +415,5 @@ class CameraFragment : Fragment() {
         initData()
         super.onPause()
     }
-
 }
 
