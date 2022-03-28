@@ -36,7 +36,7 @@ import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.util.*
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
-
+import android.view.GestureDetector
 
 private const val TAG = "CameraFragment"
 
@@ -106,7 +106,8 @@ class CameraFragment : Fragment() {
     private fun init() {
         val gestureListener = MyGesture()
         val doubleTapListener = MyDoubleGesture()
-        val gestureDetector = GestureDetector(requireContext(), gestureListener)
+        var gestureDetector = GestureDetector(requireContext(), gestureListener)
+
 
         gestureDetector.setOnDoubleTapListener(doubleTapListener)
         binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
@@ -152,17 +153,10 @@ class CameraFragment : Fragment() {
         productUtil.init(requireContext())
     }
 
-//    override fun onStart() {
-//        super.onStart()
-//        Toast.makeText(requireActivity(), "camera onStart called", Toast.LENGTH_SHORT).show()
-//        mainActivity.tts.speak("상품 인식 화면입니다." + binding.tvCameraFDescription.text.toString(), TextToSpeech.QUEUE_FLUSH, null)
-//    }
-
     override fun onResume() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-//        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
         mainActivity.tts.setSpeechRate(3f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
@@ -171,6 +165,8 @@ class CameraFragment : Fragment() {
             mAccelerometer,
             SensorManager.SENSOR_DELAY_UI
         )
+
+        mainActivity.viewpager.isUserInputEnabled = false
     }
 
     private fun initData() {
@@ -285,27 +281,55 @@ class CameraFragment : Fragment() {
         prdInfoViewModel.loadAllergen(product.prdNo)
     }
 
-    inner class MyGesture : GestureDetector.OnGestureListener {
-        override fun onDown(p0: MotionEvent?): Boolean {
-            return false
+    fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
+        val angle = getAngle(x1, y1, x2, y2)
+        return Direction.fromAngle(angle)
+    }
+
+    fun getAngle(x1: Float, y1: Float, x2: Float, y2: Float): Double {
+        val rad = Math.atan2((y1 - y2).toDouble(), (x2 - x1).toDouble()) + Math.PI
+        return (rad * 180 / Math.PI + 180) % 360
+    }
+
+    enum class Direction {
+        up, down, left, right;
+
+        companion object {
+            fun fromAngle(angle: Double): Direction {
+                return if (inRange(angle, 45f, 135f)) {
+                    up
+                } else if (inRange(angle, 0f, 45f) || inRange(angle, 315f, 360f)) {
+                    right
+                } else if (inRange(angle, 225f, 315f)) {
+                    down
+                } else {
+                    left
+                }
+            }
+
+            private fun inRange(angle: Double, init: Float, end: Float): Boolean {
+                return angle >= init && angle < end
+            }
         }
+    }
 
-        override fun onShowPress(p0: MotionEvent?) {}
-
-        override fun onSingleTapUp(p0: MotionEvent?): Boolean {
-            return false
+    fun onSwipe(direction: Direction?): Boolean {
+        if (direction === Direction.up) {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-
-        override fun onScroll(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
-            p2: Float,
-            p3: Float
-        ): Boolean {
-            return false
+        if (direction === Direction.down) {
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
+        if(direction === Direction.left) {
+            mainActivity.viewpager.currentItem = 2
+        }
+        if(direction === Direction.right){
+            mainActivity.viewpager.currentItem = 0
+        }
+        return true
+    }
 
-        override fun onLongPress(p0: MotionEvent?) {}
+    open inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
 
         override fun onFling(
             p0: MotionEvent?,
@@ -313,37 +337,15 @@ class CameraFragment : Fragment() {
             p2: Float,
             p3: Float
         ): Boolean {
-            val SWIPE_THRESHOLD = 100
-            val SWIPE_VELOCITY_THRESHOLD = 10
+            var x1 = p0!!.x
+            var y1 = p0!!.y
 
-            var result = false
-            try {
-                val diffY = p1!!.y - p0!!.y
-                val diffX = p1!!.x - p0!!.x
-                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(p3) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        onSwipeBottom()
-                    } else {
-                        onSwipeTop()
-                    }
-                    result = true
-                }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-            }
+            var x2 = p1!!.x
+            var y2 = p1!!.y
 
-            return result
+            var direction = getDirection(x1, y1, x2, y2)
+            return onSwipe(direction)
         }
-
-
-        private fun onSwipeBottom() {
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-
-        private fun onSwipeTop() {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-
     }
 
     inner class MyDoubleGesture : GestureDetector.OnDoubleTapListener {
@@ -402,6 +404,7 @@ class CameraFragment : Fragment() {
 
     override fun onPause() {
         mSensorManager.unregisterListener(mShakeUtil)
+        behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         initData()
         super.onPause()
     }

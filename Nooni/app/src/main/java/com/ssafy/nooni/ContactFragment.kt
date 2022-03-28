@@ -82,6 +82,7 @@ class ContactFragment : Fragment() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "연락처"
         mainActivity.ttsSpeak(resources.getString(R.string.ContactFrag))
+        mainActivity.viewpager.isUserInputEnabled = true
     }
 
     private fun setRecyclerView() {
@@ -143,12 +144,12 @@ class ContactFragment : Fragment() {
                         model.insert(contact)
                         mainActivity.ttsSpeak(resources.getString(R.string.ContactAddFinish))
                         handler.postDelayed(Runnable{
-                            Toast.makeText(mainActivity, resources.getString(R.string.ContactAddFinish), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mainActivity, R.string.ContactAddFinish, Toast.LENGTH_SHORT).show()
                         }, 0)
                     }catch (e: SQLiteConstraintException){
                         mainActivity.ttsSpeak(resources.getString(R.string.ContactAlreadyAdd))
                         handler.postDelayed(Runnable{
-                            Toast.makeText(mainActivity, resources.getString(R.string.ContactAlreadyAdd), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mainActivity, R.string.ContactAlreadyAdd, Toast.LENGTH_SHORT).show()
                         }, 0)
                     }
                 }
