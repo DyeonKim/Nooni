@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/nooni"
     tools:context=".tutorial.TutorialTwoFragment"
-    android:id="@+id/layout">
+    android:id="@+id/tutorial3">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/tutorial_four_lottie"

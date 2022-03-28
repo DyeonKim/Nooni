@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
@@ -36,10 +34,62 @@ class TutorialFourFragment : Fragment() {
         tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial3))
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val gestureListener = MyGesture()
+        val doubleTapListener = MyDoubleGesture()
+        val gestureDetector = GestureDetector(requireContext(), gestureListener)
 
+        gestureDetector.setOnDoubleTapListener(doubleTapListener)
+
+        binding.tutorial3.setOnTouchListener { v, event ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        }
+
+        binding.tutorial3.setOnClickListener{}
+
+    }
+
+    inner class MyGesture: GestureDetector.OnGestureListener {
+        override fun onDown(p0: MotionEvent?): Boolean {
+            return false
+        }
+
+        override fun onShowPress(p0: MotionEvent?) {
+
+        }
+
+        override fun onSingleTapUp(p0: MotionEvent?): Boolean {
+            return false
+        }
+
+        override fun onScroll(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+            return false
+        }
+
+        override fun onLongPress(p0: MotionEvent?) {
+
+        }
+
+        override fun onFling(p0: MotionEvent?, p1: MotionEvent?, p2: Float, p3: Float): Boolean {
+            return true
+        }
+
+    }
+
+    inner class MyDoubleGesture : GestureDetector.OnDoubleTapListener {
+        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
+            return false
+        }
+
+        override fun onDoubleTap(p0: MotionEvent?): Boolean {
+            tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial3))
+            return true
+        }
+
+        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
+            return false
+        }
     }
 
 

@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/nooni"
-    tools:context=".tutorial.TutorialThreeFragment">
+    tools:context=".tutorial.TutorialThreeFragment"
+    android:id="@+id/tutorial2">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/tutorial_three_lottie"
