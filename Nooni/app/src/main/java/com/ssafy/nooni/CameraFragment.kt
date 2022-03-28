@@ -157,7 +157,7 @@ class CameraFragment : Fragment() {
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
 //        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
-        mainActivity.tts.setSpeechRate(3f)
+        mainActivity.tts.setSpeechRate(2f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(

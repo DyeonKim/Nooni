@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentAllergyBinding
-import com.ssafy.nooni.util.STTUtil
 import com.ssafy.nooni.util.SharedPrefArrayListUtil
 import java.lang.StringBuilder
 
@@ -70,9 +69,9 @@ class AllergyFragment : Fragment() {
         if(allergyList?.isEmpty() == true){
             sb.append(resources.getString(R.string.NoAllergy))
         } else {
-            sb.append("등록된 알레르기는 ")
+            sb.append("등록된 알레르기는.\n")
             for(item in allergyList!!){
-                sb.append("${item}, ")
+                sb.append("${item}.\n")
             }
             sb.append("입니다.")
         }
