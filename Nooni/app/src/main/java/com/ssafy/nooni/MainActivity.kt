@@ -1,12 +1,12 @@
 package com.ssafy.nooni
 
 import android.Manifest
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
@@ -20,15 +20,37 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var permissionUtil: PermissionUtil
+    private lateinit var permissionUtil: PermissionUtil
+    private lateinit var viewpager: ViewPager2
     private val sttViewModel: SttViewModel by viewModels()
-    lateinit var tts: TextToSpeech
-    lateinit var viewpager: ViewPager2
+    var tts: TextToSpeech? = null
+
     private var cnt = 0
+    private var delay = 0L
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setUtil()
+        setViewModel()
+    }
+
+    fun onDoubleClick(view: View, function: () -> Unit) {
+        view.setOnClickListener {
+            if (System.currentTimeMillis() > delay) {
+                delay = System.currentTimeMillis() + 200
+                return@setOnClickListener
+            }
+            if (System.currentTimeMillis() <= delay) {
+                Log.d("test", "onDoubleClick: ")
+                function()
+            }
+        }
+    }
+
+    private fun setUtil() {
         STTUtil.owner = this
         STTUtil.STTinit(this, packageName)
         permissionUtil = PermissionUtil(this)
@@ -37,8 +59,26 @@ class MainActivity : AppCompatActivity() {
                 init()
             }
         }
+    }
 
+    private fun init() {
+        viewpager = binding.viewpager
+        val viewpagerFragmentAdapter = ViewpagerFragmentAdapter(this)
 
+        viewpager.adapter = viewpagerFragmentAdapter
+        viewpager.currentItem = 1
+
+        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
+            @Override
+            fun onInit(status: Int) {
+                if (status != ERROR) {
+                    tts?.language = Locale.KOREA
+                }
+            }
+        })
+    }
+
+    private fun setViewModel() {
         sttViewModel.stt.observe(this) {
             val resultString = sttViewModel.stt.value!!
             if (sttViewModel.nooni.value == true) {
@@ -97,61 +137,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun init() {
-        viewpager = binding.viewpager
-        val viewpagerFragmentAdapter = ViewpagerFragmentAdapter(this)
-
-        viewpager.adapter = viewpagerFragmentAdapter
-        viewpager.currentItem = 1
-
-        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
-            @Override
-            fun onInit(status: Int) {
-                if (status != ERROR) {
-                    tts.language = Locale.KOREA
-                }
-            }
-        })
-    }
-
-    fun ttsSpeak(text: String) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
-        } else {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        checkPermissions()
-    }
-
-    override fun onBackPressed() {
-        ttsSpeak(resources.getString(R.string.NooniClose))
-        val handler = Handler()
-        handler.postDelayed(Runnable {
-            tts.shutdown()
-            moveTaskToBack(true)
-            finish()
-        }, 1200)
-    }
-
-    override fun onRestart() {
-        STTUtil.owner = this
-        STTUtil.STTVM()
-        super.onRestart()
-    }
-
-    override fun onDestroy() {
-        if (tts != null) {
-            tts.stop()
-            tts.shutdown()
-        }
-        STTUtil.stop()
-        super.onDestroy()
-    }
-
     private fun checkPermissions() {
         if (!permissionUtil.checkPermissions(
                 listOf(
@@ -167,5 +152,41 @@ class MainActivity : AppCompatActivity() {
         } else {
             init()
         }
+    }
+
+    fun ttsSpeak(text: String) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        checkPermissions()
+    }
+
+    override fun onBackPressed() {
+        ttsSpeak(resources.getString(R.string.NooniClose))
+        val handler = Handler()
+        handler.postDelayed(Runnable {
+            tts?.shutdown()
+            moveTaskToBack(true)
+            finish()
+        }, 1200)
+    }
+
+    override fun onRestart() {
+        STTUtil.owner = this
+        STTUtil.STTVM()
+        super.onRestart()
+    }
+
+    override fun onDestroy() {
+        tts?.stop()
+        tts?.shutdown()
+        STTUtil.stop()
+        super.onDestroy()
     }
 }

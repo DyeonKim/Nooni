@@ -23,7 +23,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,11 +41,12 @@ class ContactFragment : Fragment() {
     private lateinit var contentResolver: ContentResolver
     private lateinit var contactsRVAdapter: ContactsRVAdapter
     private lateinit var getResult: ActivityResultLauncher<Intent>
-    private val model: ContactViewModel by activityViewModels()
     private lateinit var mainActivity: MainActivity
+    private val model: ContactViewModel by activityViewModels()
 
     private var contactsList = mutableListOf<Contact>()
     var contact: Contact = Contact("", "", 0, 0)
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -69,10 +69,10 @@ class ContactFragment : Fragment() {
     private fun init(){
         contactsRVAdapter = ContactsRVAdapter(requireContext())
 
-         model.getAll().observe(requireActivity(), Observer {
+         model.getAll().observe(requireActivity()) {
              contactsRVAdapter.setData(it)
              contactsRVAdapter.notifyDataSetChanged()
-         })
+         }
 
         addContact()
         setRecyclerView()
@@ -131,10 +131,10 @@ class ContactFragment : Fragment() {
                     ), null, null, null
                 )
                 cursor!!.moveToFirst()
-                contact.name = cursor!!.getString(0)
-                contact.phone = cursor!!.getString(1)
-                contact.photo_id = cursor!!.getLong(2)
-                contact.person_id = cursor!!.getLong(3)
+                contact.name = cursor.getString(0)
+                contact.phone = cursor.getString(1)
+                contact.photo_id = cursor.getLong(2)
+                contact.person_id = cursor.getLong(3)
                 cursor.close()
 
                 Log.d(TAG, "init: phone = ${contact.name}")
@@ -143,12 +143,12 @@ class ContactFragment : Fragment() {
                         model.insert(contact)
                         mainActivity.ttsSpeak(resources.getString(R.string.ContactAddFinish))
                         handler.postDelayed(Runnable{
-                            Toast.makeText(mainActivity, resources.getString(R.string.ContactAddFinish), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mainActivity, R.string.ContactAddFinish, Toast.LENGTH_SHORT).show()
                         }, 0)
                     }catch (e: SQLiteConstraintException){
                         mainActivity.ttsSpeak(resources.getString(R.string.ContactAlreadyAdd))
                         handler.postDelayed(Runnable{
-                            Toast.makeText(mainActivity, resources.getString(R.string.ContactAlreadyAdd), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(mainActivity, R.string.ContactAlreadyAdd, Toast.LENGTH_SHORT).show()
                         }, 0)
                     }
                 }
@@ -166,7 +166,7 @@ class ContactFragment : Fragment() {
         SelectDialog(requireContext())
             .setContent("다이얼 화면으로\n이동하시겠습니까?")
             .setOnNegativeClickListener{
-                mainActivity.tts.stop()
+                mainActivity.tts!!.stop()
             }
             .setOnPositiveClickListener{
                 moveDial(contact)
@@ -178,7 +178,7 @@ class ContactFragment : Fragment() {
         SelectDialog(requireContext())
             .setContent("해당 연락처를\n삭제하시겠습니까?")
             .setOnNegativeClickListener{
-                mainActivity.tts.stop()
+                mainActivity.tts!!.stop()
             }
             .setPositiveButtonText("삭제")
             .setOnPositiveClickListener{

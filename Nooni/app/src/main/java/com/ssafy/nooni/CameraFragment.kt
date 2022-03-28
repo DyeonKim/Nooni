@@ -98,17 +98,39 @@ class CameraFragment : Fragment() {
     }
 
     private fun init() {
-        val gestureListener = MyGesture()
-        val doubleTapListener = MyDoubleGesture()
-        val gestureDetector = GestureDetector(requireContext(), gestureListener)
+        val gestureDetector = GestureDetector(requireContext(), MyGesture())
 
-        gestureDetector.setOnDoubleTapListener(doubleTapListener)
-        binding.constraintLayoutCameraF.setOnTouchListener { v, event ->
-            return@setOnTouchListener gestureDetector.onTouchEvent(event)
+        binding.root.setOnTouchListener { view, motionEvent ->
+            return@setOnTouchListener gestureDetector.onTouchEvent(motionEvent)
         }
 
-        // 왜인지는 모르겠으나 onTouchListener만 달아놓으면 더블클릭 인식이 안되고 clickListener도 같이 달아놔야만 더블클릭 인식됨; 뭐징
-        binding.constraintLayoutCameraF.setOnClickListener {}
+        mainActivity.onDoubleClick(binding.root) {
+            imageDetectUtil.init()
+            // TODO: tts로 안내하기
+            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
+            mainActivity.ttsSpeak("촬영중입니다.")
+
+            for (i in 1..3) {
+                takePicture()
+            }
+
+            var time = imageDetectUtil.GIVEN_TIME
+            timer(period = 1000) {
+                time -= 1
+
+                if (time < 0) {
+                    requireActivity().runOnUiThread {
+                        imageDetectUtil.evaluateImage()
+                        dataId = imageDetectUtil.dataId
+                        var string =
+                            "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
+                        mainActivity.ttsSpeak(string)
+                        setProductData()
+                    }
+                    this.cancel()
+                }
+            }
+        }
 
         behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
         behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
@@ -116,7 +138,7 @@ class CameraFragment : Fragment() {
                 if(newState == BottomSheetBehavior.STATE_EXPANDED){
                     describeTTS()
                 } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
-                    mainActivity.tts.stop()
+                    mainActivity.tts!!.stop()
                 }
             }
 
@@ -157,7 +179,7 @@ class CameraFragment : Fragment() {
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
 //        Toast.makeText(requireActivity(), "camera onResume called", Toast.LENGTH_SHORT).show()
-        mainActivity.tts.setSpeechRate(2f)
+        mainActivity.tts!!.setSpeechRate(2f)
         mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
 
         mSensorManager.registerListener(
@@ -299,106 +321,6 @@ class CameraFragment : Fragment() {
         prdInfoViewModel.loadAllergen(prdNo)
     }
 
-    inner class MyGesture : GestureDetector.OnGestureListener {
-        override fun onDown(p0: MotionEvent?): Boolean {
-            return false
-        }
-
-        override fun onShowPress(p0: MotionEvent?) {}
-
-        override fun onSingleTapUp(p0: MotionEvent?): Boolean {
-            return false
-        }
-
-        override fun onScroll(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
-            p2: Float,
-            p3: Float
-        ): Boolean {
-            return false
-        }
-
-        override fun onLongPress(p0: MotionEvent?) {}
-
-        override fun onFling(
-            p0: MotionEvent?,
-            p1: MotionEvent?,
-            p2: Float,
-            p3: Float
-        ): Boolean {
-            val SWIPE_THRESHOLD = 100
-            val SWIPE_VELOCITY_THRESHOLD = 10
-
-            var result = false
-            try {
-                val diffY = p1!!.y - p0!!.y
-                val diffX = p1!!.x - p0!!.x
-                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(p3) > SWIPE_VELOCITY_THRESHOLD) {
-                    if (diffY > 0) {
-                        onSwipeBottom()
-                    } else {
-                        onSwipeTop()
-                    }
-                    result = true
-                }
-            } catch (exception: Exception) {
-                exception.printStackTrace()
-            }
-
-            return result
-        }
-
-
-        private fun onSwipeBottom() {
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-
-        private fun onSwipeTop() {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-
-    }
-
-    inner class MyDoubleGesture : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
-            return false
-        }
-
-        override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            imageDetectUtil.init()
-            // TODO: tts로 안내하기
-            Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
-            mainActivity.ttsSpeak("촬영중입니다.")
-
-            for(i in 1..3) {
-                takePicture()
-            }
-
-            var time = imageDetectUtil.GIVEN_TIME
-            timer(period = 1000) {
-                time -= 1
-
-                if(time < 0) {
-                    requireActivity().runOnUiThread {
-                        imageDetectUtil.evaluateImage()
-                        dataId = imageDetectUtil.dataId
-                        var string = "제품은 ${String.format("%s", imageDetectUtil.classes[dataId])}입니다."
-                        mainActivity.ttsSpeak(string)
-                        setProductData()
-                    }
-                    this.cancel()
-                }
-            }
-            return true
-        }
-
-        override fun onDoubleTapEvent(p0: MotionEvent?): Boolean {
-            return false
-        }
-    }
-
-
     private fun describeTTS() {
         val name  = binding.tvCameraFBsName.text
         val price = binding.tvCameraFBsPrice.text
@@ -414,6 +336,44 @@ class CameraFragment : Fragment() {
         mSensorManager.unregisterListener(mShakeUtil)
         initData()
         super.onPause()
+    }
+
+    inner class MyGesture : GestureDetector.SimpleOnGestureListener() {
+        override fun onFling(
+            e1: MotionEvent,
+            e2: MotionEvent,
+            velocityX: Float,
+            velocityY: Float
+        ): Boolean {
+            val SWIPE_THRESHOLD = 100
+            val SWIPE_VELOCITY_THRESHOLD = 10
+
+            var result = false
+            try {
+                val diffY = e2.y - e1.y
+                val diffX = e2.x - e1.x
+                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        onSwipeBottom()
+                    } else {
+                        onSwipeTop()
+                    }
+                    result = true
+                }
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
+
+            return result
+        }
+
+        private fun onSwipeBottom() {
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        private fun onSwipeTop() {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 }
 

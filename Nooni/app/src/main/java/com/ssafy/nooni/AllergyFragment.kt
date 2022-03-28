@@ -44,14 +44,8 @@ class AllergyFragment : Fragment() {
     }
 
     private fun init() {
-        binding.root.setOnClickListener {
-            if (System.currentTimeMillis() > delay) {
-                delay = System.currentTimeMillis() + 200
-                return@setOnClickListener
-            }
-            if (System.currentTimeMillis() <= delay) {
-                startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
-            }
+        mainActivity.onDoubleClick(binding.root) {
+            startActivity(Intent(requireActivity(), RegisterAllergyActivity::class.java))
         }
 
         allergyList = sharePrefArrayListUtil.getAllergies()
@@ -62,7 +56,7 @@ class AllergyFragment : Fragment() {
         super.onResume()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "알레르기"
 
-        var sb = StringBuilder()
+        val sb = StringBuilder()
         sb.append(resources.getString(R.string.AllergyFrag))
         if(allergyList?.isEmpty() == true){
             sb.append(resources.getString(R.string.NoAllergy))
@@ -93,6 +87,6 @@ class AllergyFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        mainActivity.tts.stop()
+        mainActivity.tts!!.stop()
     }
 }
