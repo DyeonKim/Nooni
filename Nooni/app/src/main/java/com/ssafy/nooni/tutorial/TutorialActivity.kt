@@ -3,6 +3,7 @@ package com.ssafy.nooni.tutorial
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.preference.PreferenceManager
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
@@ -69,6 +70,15 @@ class TutorialActivity : AppCompatActivity() {
             }
         }
 
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PreferenceManager.getDefaultSharedPreferences(this).edit().apply {
+            putBoolean("COMPLETED_ONBOARDING", true)
+            apply()
+        }
 
     }
 }

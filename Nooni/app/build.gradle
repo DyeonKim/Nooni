@@ -117,4 +117,7 @@ dependencies {
 
     //lottie file
     implementation 'com.airbnb.android:lottie:3.0.7'
+
+    //androidx preference
+    implementation "androidx.preference:preference-ktx:1.1.0"
 }

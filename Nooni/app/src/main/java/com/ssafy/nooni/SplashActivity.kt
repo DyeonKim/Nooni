@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import androidx.preference.PreferenceManager
+import com.ssafy.nooni.tutorial.TutorialActivity
 
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +18,13 @@ class SplashActivity : AppCompatActivity() {
     fun startLoading(){
         val handler = Handler()
         handler.postDelayed(Runnable {
-            startActivity(Intent(applicationContext, MainActivity::class.java))
+            PreferenceManager.getDefaultSharedPreferences(this).apply {
+                if(getBoolean("COMPLETED_ONBOARDING", false)) {
+                    startActivity(Intent(applicationContext, MainActivity::class.java))
+                } else {
+                    startActivity(Intent(applicationContext, TutorialActivity::class.java))
+                }
+            }
             finish()
         }, 3000)
     }

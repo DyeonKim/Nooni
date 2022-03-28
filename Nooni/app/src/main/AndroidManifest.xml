@@ -12,7 +12,8 @@
         android:theme="@style/Theme.Nooni">
         <activity
             android:name=".tutorial.TutorialActivity"
-            android:exported="false" />
+            android:exported="false" >
+        </activity>
         <activity
             android:name=".SplashActivity"
             android:exported="true">
