@@ -41,11 +41,11 @@
             android:layout_marginBottom="70dp"
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="50sp"
+            android:maxLines="1"
             android:gravity="center_horizontal"
             android:text="@string/CameraFragBeforeDetection"
             android:layout_weight="4"
-            android:textColor="@color/black"
-            android:textSize="50sp" />
+            android:textColor="@color/black" />
 
     </LinearLayout>
 
