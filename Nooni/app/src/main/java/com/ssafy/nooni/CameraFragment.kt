@@ -157,9 +157,11 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        mainActivity.tts!!.setSpeechRate(2f)
-        mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
-
+        GlobalScope.launch {
+            delay(500)
+            mainActivity.tts!!.setSpeechRate(2f)
+            mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
+        }
         mSensorManager.registerListener(
             mShakeUtil,
             mAccelerometer,

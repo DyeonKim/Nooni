@@ -2,15 +2,19 @@ package com.ssafy.nooni.tutorial
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Toast
 import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
 import com.ssafy.nooni.databinding.FragmentTutorialOneBinding
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.concurrent.timer
 
-
+private const val TAG = "TutorialOneFragment"
 class TutorialOneFragment : Fragment() {
     private lateinit var binding: FragmentTutorialOneBinding
     private lateinit var tutorialActivity: TutorialActivity
@@ -30,11 +34,16 @@ class TutorialOneFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial0))
+        GlobalScope.launch {
+            delay(500)
+            tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial0))
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated: ")
         val gestureListener = MyGesture()
         val doubleTapListener = MyDoubleGesture()
         val gestureDetector = GestureDetector(requireContext(), gestureListener)
