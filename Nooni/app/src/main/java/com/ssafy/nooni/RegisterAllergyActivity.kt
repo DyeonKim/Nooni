@@ -31,7 +31,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private val allergyList = ArrayList<String>()
     private val sttViewModel: SttViewModel by viewModels()
     var cnt = 0
-    var noonicnt = 0
+    private var noonicnt = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,14 +106,13 @@ class RegisterAllergyActivity : AppCompatActivity() {
                     return@observe
                 }
             }
-            if (noonicnt == 0) {
+            if (noonicnt) {
                 Log.d("tst6", "onCreate: ")
                 ttsSpeak(resources.getString(R.string.AllergyQuestion))
-                noonicnt++
             } else {
                 ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
-                noonicnt = 0
             }
+            noonicnt=!noonicnt
             return@observe
         }
     }
