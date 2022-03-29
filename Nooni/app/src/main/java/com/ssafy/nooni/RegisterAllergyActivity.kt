@@ -9,39 +9,44 @@ import android.speech.tts.TextToSpeech.ERROR
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.GestureDetectorCompat
 import com.ssafy.nooni.viewmodel.SttViewModel
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.STTUtil
-import com.ssafy.nooni.util.SharedPrefArrayListUtil
-import java.lang.StringBuilder
 import java.util.*
-import kotlin.collections.ArrayList
 
 private const val TAG = "RegisterAllergy"
 
 class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterAllergyBinding
-    private lateinit var sharePrefArrayListUtil: SharedPrefArrayListUtil
     private lateinit var mDetector: GestureDetectorCompat
-    private lateinit var list: Array<String>
-    private var tts2: TextToSpeech? = null
-    private val allergyList = ArrayList<String>()
     private val sttViewModel: SttViewModel by viewModels()
-    var cnt = 0
-    var noonicnt = 0
-
+    lateinit var onAnswerListener: OnAnswerListener
+    var tts2: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterAllergyBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        sharePrefArrayListUtil = SharedPrefArrayListUtil(this)
-        mDetector = GestureDetectorCompat(this, MyGestureListener())
-        list = resources.getStringArray(R.array.allergy_names)
 
+        mDetector = GestureDetectorCompat(this, MyGestureListener())
+
+        initViewModel()
+        initSTT()
+
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.fc_view)
+
+        if (currentFragment == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fc_view, StartRegisterFragment())
+                .commit()
+        }
+    }
+
+    private fun initSTT() {
+        STTUtil.owner = this
+        STTUtil.STTVM()
         tts2 = TextToSpeech(this, TextToSpeech.OnInitListener {
             @Override
             fun onInit(status: Int) {
@@ -50,12 +55,8 @@ class RegisterAllergyActivity : AppCompatActivity() {
                 }
             }
         })
-        STTUtil.owner = this
-        STTUtil.STTVM()
-        init()
-        initViewModel()
-        Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
 
+        Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
         //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
         tts2?.setSpeechRate(2f)
         val handler = Handler(Looper.getMainLooper())
@@ -67,28 +68,6 @@ class RegisterAllergyActivity : AppCompatActivity() {
         sttViewModel.setStt(resources.getString(R.string.init))
     }
 
-    private fun ttsSpeak(text: String) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
-        } else {
-            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-        }
-    }
-
-    private fun init() {
-        // TODO: 맨 처음 멘트 안나오는거 수정해야함
-        Log.d("tst", "init: " + tts2)
-        binding.tvAllergyAType.text = list[cnt]
-
-        binding.btnAllergyANo.setOnClickListener {
-            allergyNext()
-        }
-        binding.btnAllergyAYes.setOnClickListener {
-            allergyList.add(list[cnt])
-            allergyNext()
-        }
-    }
-
     private fun initViewModel() {
         sttViewModel.stt.observe(this) {
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
@@ -96,58 +75,32 @@ class RegisterAllergyActivity : AppCompatActivity() {
             resources.getStringArray(R.array.yes).forEach {
                 if (resultString.indexOf(it) > -1) {
                     Log.d("tst6", "onCreate: yes")
-                    allergyList.add(list[cnt])
-                    allergyNext()
+                    onAnswerListener.setAnswer(true)
                     return@observe
                 }
             }
             resources.getStringArray(R.array.no).forEach {
                 if (resultString.indexOf(it) > -1) {
                     Log.d("tst6", "onCreate: no")
-                    allergyNext()
+                    onAnswerListener.setAnswer(false)
                     return@observe
                 }
             }
-            if (noonicnt == 0) {
-                Log.d("tst6", "onCreate: ")
-                if (cnt == 0) {
-                    ttsSpeak(resources.getString(R.string.AllergyQuestion))
-                } else {
-                    ttsSpeak(resources.getString(R.string.NooniAgain))
-                }
-                noonicnt++
-            } else {
-                sttViewModel.setNooni(false)
-                noonicnt = 0
-            }
-            return@observe
-        }
-
-        sttViewModel.nooni.observe(this) {
-
-            if (sttViewModel.nooni.value == false) {
-                ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
-            }
         }
     }
 
-    fun allergyNext() {
-        if (++cnt >= list.size) save()
-        else {
-            binding.tvAllergyAType.text = list[cnt]
-            ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
+    fun ttsSpeak(text: String) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            tts2?.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
 
-    private fun save() {
-        sharePrefArrayListUtil.setAllergies(allergyList)
-        Toast.makeText(this, resources.getString(R.string.AllergyFinish), Toast.LENGTH_SHORT).show()
-        tts2?.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(Runnable {
-            tts2?.shutdown()
-            finish()
-        }, 2000)
+    fun startRegisterAllergy() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fc_view, RegisterAllergyFragment())
+            .commit()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -163,7 +116,6 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         tts2?.stop()
         tts2?.shutdown()
     }
@@ -179,14 +131,17 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     inner class MyGestureListener : GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-            allergyList.add(list[cnt])
-            allergyNext()
+            onAnswerListener.setAnswer(true)
             return true
         }
 
         override fun onDoubleTap(e: MotionEvent?): Boolean {
-            allergyNext()
+            onAnswerListener.setAnswer(false)
             return true
         }
+    }
+
+    interface OnAnswerListener {
+        fun setAnswer(answer: Boolean)
     }
 }
