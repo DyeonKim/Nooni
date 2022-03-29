@@ -15,7 +15,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
-import androidx.camera.core.internal.utils.ImageUtil
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -28,7 +27,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.nooni.adapter.AllergyRVAdapter
 import com.ssafy.nooni.databinding.FragmentCameraBinding
 import kotlinx.coroutines.*
-import org.json.JSONArray
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 import java.nio.ByteBuffer
@@ -157,9 +155,11 @@ class CameraFragment : Fragment() {
         super.onResume()
         startCamera()
         mainActivity.findViewById<TextView>(R.id.tv_title).text = "상품 인식"
-        mainActivity.tts!!.setSpeechRate(2f)
-        mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
-
+        GlobalScope.launch {
+            delay(500)
+            mainActivity.tts!!.setSpeechRate(2f)
+            mainActivity.ttsSpeak(resources.getString(R.string.CameraFrag))
+        }
         mSensorManager.registerListener(
             mShakeUtil,
             mAccelerometer,
@@ -344,11 +344,10 @@ class CameraFragment : Fragment() {
         val allergen = prdInfoViewModel.allergenList.value.toString()
         val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
 
-        var string = ""
-        if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
-            string = resources.getString(R.string.BSBeforeDetection)
+        val string = if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
+            resources.getString(R.string.BSBeforeDetection)
         } else {
-            string = "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
         }
         mainActivity.ttsSpeak(string)
     }
@@ -371,17 +370,11 @@ class CameraFragment : Fragment() {
     }
 
     fun onSwipe(direction: Direction?): Boolean {
-        if (direction === Direction.up) {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-        if (direction === Direction.down) {
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-        if (direction === Direction.left) {
-            mainActivity.viewpager.currentItem = 2
-        }
-        if (direction === Direction.right) {
-            mainActivity.viewpager.currentItem = 0
+        when (direction) {
+            Direction.up    -> behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            Direction.down  -> behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            Direction.left  -> mainActivity.viewpager.currentItem = 2
+            Direction.right -> mainActivity.viewpager.currentItem = 0
         }
         return true
     }
@@ -394,13 +387,13 @@ class CameraFragment : Fragment() {
             p2: Float,
             p3: Float
         ): Boolean {
-            var x1 = p0.x
-            var y1 = p0.y
+            val x1 = p0.x
+            val y1 = p0.y
 
-            var x2 = p1.x
-            var y2 = p1.y
+            val x2 = p1.x
+            val y2 = p1.y
 
-            var direction = getDirection(x1, y1, x2, y2)
+            val direction = getDirection(x1, y1, x2, y2)
             return onSwipe(direction)
         }
     }

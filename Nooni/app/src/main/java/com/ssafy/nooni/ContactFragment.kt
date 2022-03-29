@@ -89,7 +89,7 @@ class ContactFragment : Fragment() {
 
         binding.rvContactFContact.apply {
             adapter = contactsRVAdapter
-            layoutManager = GridLayoutManager(requireContext(), 2, RecyclerView.VERTICAL, false)
+            layoutManager = GridLayoutManager(requireContext(), 1, RecyclerView.VERTICAL, false)
         }
 
         if(contactsList.isNotEmpty()) {
