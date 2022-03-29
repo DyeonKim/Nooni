@@ -35,7 +35,6 @@
         <item>그래</item>
         <item>있어요</item>
         <item>있음</item>
-        <item>있습니다</item>
         <item>예스</item>
     </string-array>
     <string-array name="no">
@@ -47,7 +46,6 @@
         <item>없다</item>
         <item>없어</item>
         <item>노</item>
-        <item>없습니다</item>
         <item>없어요</item>
     </string-array>
        <string name="GoBack">이전화면으로 돌아갑니다. </string>
