@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="나는"
             android:textAlignment="center"
-            android:textColor="@color/nooni"
+            android:textColor="@color/black"
             android:textSize="34sp" />
 
         <TextView
@@ -47,23 +47,26 @@
             android:layout_height="wrap_content"
             android:text="알레르기가 있다"
             android:textAlignment="center"
-            android:textColor="@color/nooni"
+            android:textColor="@color/black"
             android:textSize="34sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="32dp"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/btn_allergyA_no"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:backgroundTint="@color/white"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/img_btn_set_no" />
+                app:srcCompat="@drawable/non" />
 
             <ImageButton
                 android:id="@+id/btn_allergyA_yes"
@@ -71,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:backgroundTint="@color/white"
-                app:srcCompat="@drawable/img_btn_set_yes" />
+                app:srcCompat="@drawable/yesy" />
         </LinearLayout>
 
 
