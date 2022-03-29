@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textColor="@color/black"
-            android:textSize="48sp"
+            android:textSize="48dp"
             android:text="연락처 등록"/>
     </RelativeLayout>
 

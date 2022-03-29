@@ -32,7 +32,7 @@
         android:text="화면을 두 번 연속으로 터치해주세요!"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="24sp"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 

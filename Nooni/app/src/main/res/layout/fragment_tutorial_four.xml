@@ -32,7 +32,7 @@
         android:text="전화 도움 요청을 할 수 있어요!"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="24sp"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 
