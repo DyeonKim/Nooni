@@ -6,12 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ssafy.nooni.databinding.FragmentStartRegisterBinding
+import androidx.viewpager2.widget.ViewPager2
+import com.ssafy.nooni.databinding.FragmentTutorialAllergyBinding
 
 
 class TutorialAllergyFragment : Fragment() {
-    private lateinit var binding: FragmentStartRegisterBinding
+    private lateinit var binding: FragmentTutorialAllergyBinding
     private lateinit var registerAllergyAct: RegisterAllergyActivity
+    private lateinit var tutoAllergyPagerAdapter: TutoAllergyPagerAdapter
+    private val files = ArrayList<Pair<String, String>>()
 
 
     override fun onAttach(context: Context) {
@@ -23,16 +26,39 @@ class TutorialAllergyFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        binding = FragmentStartRegisterBinding.inflate(inflater, container, false)
+        binding = FragmentTutorialAllergyBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        files.add(Pair("yes_or_no.json", "방법 1"))
+        files.add(Pair("voice_icon.json", "방법 2"))
+        files.add(Pair("hand_click_gesture.json", "방법 3"))
+
+        initView()
         initEvent()
     }
 
+    private fun initView() {
+        tutoAllergyPagerAdapter = TutoAllergyPagerAdapter(files)
+        binding.vpagerAllergyTutorial.apply {
+            adapter     = tutoAllergyPagerAdapter
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        }
+
+        binding.dotsIndicator.setViewPager2(binding.vpagerAllergyTutorial)
+    }
+
     private fun initEvent() {
+        binding.btnPrev.setOnClickListener {
+
+        }
+
+        binding.btnNext.setOnClickListener {
+
+        }
+
         registerAllergyAct.onAnswerListener = object : RegisterAllergyActivity.OnAnswerListener {
             override fun setAnswer(answer: Boolean) {
                 when(answer) {
@@ -45,5 +71,7 @@ class TutorialAllergyFragment : Fragment() {
                 }
             }
         }
+
     }
+
 }
