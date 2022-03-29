@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import com.ssafy.nooni.databinding.FragmentStartRegisterBinding
 
 
-class StartRegisterFragment : Fragment() {
+class TutorialAllergyFragment : Fragment() {
     private lateinit var binding: FragmentStartRegisterBinding
     private lateinit var registerAllergyAct: RegisterAllergyActivity
 

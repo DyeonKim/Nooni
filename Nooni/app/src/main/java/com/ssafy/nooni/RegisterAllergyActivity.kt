@@ -39,7 +39,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
         if (currentFragment == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fc_view, StartRegisterFragment())
+                .replace(R.id.fc_view, TutorialAllergyFragment())
                 .commit()
         }
     }
