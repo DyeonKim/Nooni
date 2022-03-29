@@ -15,19 +15,24 @@
         <item>누리와</item>
         <item>은희야</item>
     </string-array>
+
     <string-array name="camera">
         <item>카메라</item>
         <item>홈</item>
     </string-array>
+
     <string-array name="contact">
         <item>연락처</item>
     </string-array>
+
     <string-array name="allergy">
         <item>알레르기</item>
         <item>알러지</item>
     </string-array>
+
     <string name="NooniReady">네 말씀해주세요</string>
     <string name="NooniAgain">다시한번 말씀해주세요</string>
+
     <string-array name="yes">
         <item>네</item>
         <item>예</item>
@@ -38,6 +43,7 @@
         <item>있습니다</item>
         <item>예스</item>
     </string-array>
+
     <string-array name="no">
         <item>아니요</item>
         <item>안이요</item>
@@ -50,7 +56,8 @@
         <item>없습니다</item>
         <item>없어요</item>
     </string-array>
-       <string name="GoBack">이전화면으로 돌아갑니다. </string>
+
+    <string name="GoBack">이전화면으로 돌아갑니다. </string>
     <string name="NooniClose">누니를 종료합니다. </string>
     <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
     <string name="CameraFragBeforeDetection">인식된 상품이 없습니다</string>
@@ -79,6 +86,8 @@
     제품의 가격, 알레르기 유발 성분도 음성으로 안내합니다.</string>
     <string name="tutorial3">연락처 등록을 통해 지인에게 전화 도움 요청을 할 수 있습니다. 이제 누니 앱의 설명은 끝입니다.
      누니 앱의 기능을 사용하려면 화면을 오른쪽으로 스와이프 해주세요.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
