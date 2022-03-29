@@ -30,7 +30,7 @@
             android:text="촬영하려면 화면을 두 번 눌러주세요"
             android:textAlignment="center"
             android:textColor="@color/nooni"
-            android:textSize="24sp" />
+            android:textSize="24dp" />
 
 
         <TextView
@@ -92,7 +92,7 @@
                 android:gravity="center"
                 android:text="@string/BSBeforeDetection"
                 android:textColor="@color/black"
-                android:textSize="34sp" />
+                android:textSize="34dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -112,7 +112,7 @@
                 android:layout_marginBottom="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="34sp" />
+                android:textSize="34dp" />
 
             <View
                 android:layout_width="300dp"
@@ -129,7 +129,7 @@
                 android:layout_margin="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="34sp" />
+                android:textSize="34dp" />
 
             <View
                 android:layout_width="300dp"
@@ -146,7 +146,7 @@
                 android:layout_margin="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/grey"
-                android:textSize="24sp" />
+                android:textSize="24dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_cameraF_bs_allergy"
@@ -172,7 +172,7 @@
                 android:text="확인 중..."
                 android:textAlignment="center"
                 android:textColor="@color/grey"
-                android:textSize="24sp" />
+                android:textSize="24dp" />
         </LinearLayout>
 
     </LinearLayout>

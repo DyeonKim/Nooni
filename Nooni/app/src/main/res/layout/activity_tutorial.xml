@@ -88,7 +88,7 @@
                 android:fontFamily="@font/nanumsquareround_b"
                 android:text="다음"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="18dp" />
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

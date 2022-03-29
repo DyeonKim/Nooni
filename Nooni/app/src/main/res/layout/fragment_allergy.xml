@@ -13,7 +13,7 @@
         android:text="등록된 알레르기"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="48sp" />
+        android:textSize="48dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_allergyF_allergy"
@@ -28,7 +28,7 @@
         android:text="알레르기 정보를 수정하시려면\n화면을 두 번 누르세요"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="30sp" />
+        android:textSize="30dp" />
 
 
 </LinearLayout>
