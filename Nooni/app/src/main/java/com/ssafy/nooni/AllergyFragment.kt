@@ -57,7 +57,7 @@ class AllergyFragment : Fragment() {
         mainActivity.viewpager.isUserInputEnabled = true
 
         val sb = StringBuilder()
-        sb.append(resources.getString(R.string.AllergyFrag))
+        sb.append(resources.getString(R.string.AllergyFrag)).append("\n")
         if(allergyList?.isEmpty() == true){
             sb.append(resources.getString(R.string.NoAllergy))
         } else {
@@ -65,7 +65,7 @@ class AllergyFragment : Fragment() {
             for(item in allergyList!!){
                 sb.append("${item}.\n")
             }
-            sb.append("입니다.")
+            sb.append("입니다.").append("\n")
         }
         sb.append(resources.getString(R.string.AllergyChange))
         mainActivity.ttsSpeak(sb.toString())
