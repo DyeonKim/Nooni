@@ -31,7 +31,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private val allergyList = ArrayList<String>()
     private val sttViewModel: SttViewModel by viewModels()
     var cnt = 0
-    var noonicnt = 0
+    private var noonicnt = true
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,13 +58,11 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
         //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
         tts2?.setSpeechRate(2f)
+
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
-            sttViewModel.setNooni(true)
             sttViewModel.setStt(resources.getString(R.string.init))
         }, 1000)
-        sttViewModel.setStt("")
-        sttViewModel.setStt(resources.getString(R.string.init))
     }
 
     private fun ttsSpeak(text: String) {
@@ -76,7 +74,6 @@ class RegisterAllergyActivity : AppCompatActivity() {
     }
 
     private fun init() {
-        // TODO: 맨 처음 멘트 안나오는거 수정해야함
         Log.d("tst", "init: " + tts2)
         binding.tvAllergyAType.text = list[cnt]
 
@@ -90,6 +87,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
     }
 
     private fun initViewModel() {
+        Log.d("tst6", "tst: " + noonicnt + " " + cnt)
         sttViewModel.stt.observe(this) {
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
             val resultString = sttViewModel.stt.value!!
@@ -108,26 +106,14 @@ class RegisterAllergyActivity : AppCompatActivity() {
                     return@observe
                 }
             }
-            if (noonicnt == 0) {
+            if (noonicnt) {
                 Log.d("tst6", "onCreate: ")
-                if (cnt == 0) {
-                    ttsSpeak(resources.getString(R.string.AllergyQuestion))
-                } else {
-                    ttsSpeak(resources.getString(R.string.NooniAgain))
-                }
-                noonicnt++
+                ttsSpeak(resources.getString(R.string.AllergyQuestion))
             } else {
-                sttViewModel.setNooni(false)
-                noonicnt = 0
+                ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
             }
+            noonicnt=!noonicnt
             return@observe
-        }
-
-        sttViewModel.nooni.observe(this) {
-
-            if (sttViewModel.nooni.value == false) {
-                ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
-            }
         }
     }
 
@@ -135,7 +121,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
         if (++cnt >= list.size) save()
         else {
             binding.tvAllergyAType.text = list[cnt]
-            ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
+            ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
         }
     }
 
