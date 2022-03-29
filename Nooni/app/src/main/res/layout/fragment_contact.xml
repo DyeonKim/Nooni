@@ -15,13 +15,22 @@
         android:layout_gravity="center"
         android:layout_weight="3" />
 
-    <ImageButton
+    <RelativeLayout
         android:id="@+id/imageButton_contactF_add"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginBottom="20dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/add"/>
+        android:background="@drawable/radius_back">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="@color/black"
+            android:textSize="48sp"
+            android:text="연락처 등록"/>
+    </RelativeLayout>
 
 
 </LinearLayout>

@@ -72,7 +72,7 @@
     <string name="AllergyChange">수정하시려면 화면을 두 번 누르세요. </string>
     <string name="ContactCall"> 님에게 전화를 거시겠습니까?</string>
     <string name="ContactRemoveAsk"> 님의 연락처를 삭제하시겠습니까?</string>
-    <string name="ContactFrag">연락처 화면입니다.</string>
+    <string name="ContactFrag">연락처 화면입니다. 연락처를 등록하려면 화면 맨아래 버튼을 눌러주세요.</string>
     <string name="ContactAddFinish">연락처 등록이 완료되었습니다.</string>
     <string name="ContactAlreadyAdd">이미 등록되어있는 연락처 입니다.</string>
     <string name="ContactRemove">연락처가 삭제되었습니다.</string>
