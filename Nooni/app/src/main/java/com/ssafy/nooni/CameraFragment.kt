@@ -118,11 +118,11 @@ class CameraFragment : Fragment() {
         }
 
         behavior = BottomSheetBehavior.from(binding.llCameraFBottomSheet)
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback(){
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if(newState == BottomSheetBehavior.STATE_EXPANDED){
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     describeTTS()
-                } else if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     mainActivity.tts!!.stop()
                 }
             }
@@ -168,6 +168,10 @@ class CameraFragment : Fragment() {
             SensorManager.SENSOR_DELAY_UI
         )
 
+        binding.llCameraFAfterD.visibility = View.GONE
+        binding.llCameraFBeforeD.visibility = View.VISIBLE
+        binding.tvCameraFRes.text = resources.getString(R.string.CameraFragBeforeDetection)
+
         mainActivity.viewpager.isUserInputEnabled = false
     }
 
@@ -189,7 +193,8 @@ class CameraFragment : Fragment() {
                     it.setSurfaceProvider(binding.previewViewCameraF.surfaceProvider)
                 }
 
-            imageCapture = ImageCapture.Builder().setJpegQuality(75).setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY).build()
+            imageCapture = ImageCapture.Builder().setJpegQuality(75)
+                .setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY).build()
 
             //후면 카메라 기본으로 세팅
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -212,7 +217,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun classifyProduct() {
-        for(i in 1..imageDetectUtil.CHECK_CNT) {
+        for (i in 1..imageDetectUtil.CHECK_CNT) {
             takePicture()
         }
 
@@ -220,11 +225,16 @@ class CameraFragment : Fragment() {
         timer(period = 1000) {
             time -= 1
 
-            if(time < 0) {
+            if (time < 0) {
                 requireActivity().runOnUiThread {
                     val image = imageDetectUtil.getEvaluatedImage()
-                    if(image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
-                        val string = "제품은 ${String.format("%s", productUtil.getProductData(image.id).name)}입니다."
+                    if (image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                        val string = "제품은 ${
+                            String.format(
+                                "%s",
+                                productUtil.getProductData(image.id).name
+                            )
+                        }입니다."
                         mainActivity.ttsSpeak(string)
                     } else {
                         mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
@@ -260,8 +270,21 @@ class CameraFragment : Fragment() {
                     var rotateMatrix = Matrix()
                     rotateMatrix.postRotate(90.0f)
 
-                    var cropImage = Bitmap.createScaledBitmap(bitmap, imageDetectUtil.IMAGE_SIZE, imageDetectUtil.IMAGE_SIZE, false)
-                    cropImage = Bitmap.createBitmap(cropImage, 0, 0, cropImage.width, cropImage.height, rotateMatrix, false)
+                    var cropImage = Bitmap.createScaledBitmap(
+                        bitmap,
+                        imageDetectUtil.IMAGE_SIZE,
+                        imageDetectUtil.IMAGE_SIZE,
+                        false
+                    )
+                    cropImage = Bitmap.createBitmap(
+                        cropImage,
+                        0,
+                        0,
+                        cropImage.width,
+                        cropImage.height,
+                        rotateMatrix,
+                        false
+                    )
 
                     imageDetectUtil.classifyImage(cropImage)
                     super.onCaptureSuccess(image)
@@ -272,7 +295,7 @@ class CameraFragment : Fragment() {
 
     private fun setBottomSheetRecyclerView() {
         allergyRVAdapter = AllergyRVAdapter()
-        binding.rvCameraFBsAllergy.apply{
+        binding.rvCameraFBsAllergy.apply {
             adapter = allergyRVAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
@@ -293,33 +316,42 @@ class CameraFragment : Fragment() {
         // 바코드 정보를 가지고 크롤링한 후 가져온 HTML을 파싱하여 가격정보 추출하고 표시
         CoroutineScope(Dispatchers.IO).launch {
             val url = "https://www.cvslove.com/product/product_view.asp?pcode=${product.bcode}"
-            val doc = Jsoup.connect(url).timeout(1000*10).get()
+            val doc = Jsoup.connect(url).timeout(1000 * 10).get()
             val contentData: Elements = doc.select("#Table4")
             var price = ""
             Log.d(TAG, "setBottomSheetData: $contentData")
 
-            for(data in contentData) {
+            for (data in contentData) {
                 val element = data.select("td")
-                for(j in 0 until element.size) {
+                for (j in 0 until element.size) {
                     val label = element[j].text()
-                    if(label == "소비자가격")
-                        price = element[j+1].text()
+                    if (label == "소비자가격")
+                        price = element[j + 1].text()
                 }
                 Log.d(TAG, "setBottomSheetData: price = $price")
                 binding.tvCameraFBsPrice.text = price
             }
         }
         prdInfoViewModel.loadAllergen(product.prdNo)
+
+        binding.llCameraFAfterD.visibility = View.VISIBLE
+        binding.llCameraFBeforeD.visibility = View.GONE
+
+        prdInfoViewModel.loadAllergen(product.prdNo)
     }
 
     private fun describeTTS() {
-        val name  = binding.tvCameraFBsName.text
+        val name = binding.tvCameraFBsName.text
         val price = binding.tvCameraFBsPrice.text
         val allergen = prdInfoViewModel.allergenList.value.toString()
         val strIsAllergy = binding.tvCameraFBsNoticeAllergy.text
 
-        var string =
-            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+        var string = ""
+        if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
+            string = resources.getString(R.string.BSBeforeDetection)
+        } else {
+            string = "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+        }
         mainActivity.ttsSpeak(string)
     }
 
@@ -347,10 +379,10 @@ class CameraFragment : Fragment() {
         if (direction === Direction.down) {
             behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
-        if(direction === Direction.left) {
+        if (direction === Direction.left) {
             mainActivity.viewpager.currentItem = 2
         }
-        if(direction === Direction.right){
+        if (direction === Direction.right) {
             mainActivity.viewpager.currentItem = 0
         }
         return true
@@ -397,4 +429,3 @@ enum class Direction {
         }
     }
 }
-
