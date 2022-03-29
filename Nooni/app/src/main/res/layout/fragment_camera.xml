@@ -42,7 +42,7 @@
             android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="50sp"
             android:gravity="center_horizontal"
-            tools:text="(삼양) 짱구"
+            android:text="@string/CameraFragBeforeDetection"
             android:layout_weight="4"
             android:textColor="@color/black"
             android:textSize="50sp" />
@@ -77,6 +77,26 @@
             android:background="@drawable/logo_line" />
 
         <LinearLayout
+            android:id="@+id/ll_cameraF_beforeD"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/rectangle"
+            android:backgroundTint="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:gravity="center"
+                android:text="@string/BSBeforeDetection"
+                android:textColor="@color/black"
+                android:textSize="34sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_cameraF_afterD"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"

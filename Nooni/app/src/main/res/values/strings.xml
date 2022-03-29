@@ -53,6 +53,8 @@
        <string name="GoBack">이전화면으로 돌아갑니다. </string>
     <string name="NooniClose">누니를 종료합니다. </string>
     <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
+    <string name="CameraFragBeforeDetection">인식된 상품이 없습니다</string>
+    <string name="BSBeforeDetection">인식된 상품이 없습니다.\n인식할 상품을 촬영해주세요.</string>
 
     <string name="AllergyNotice">%1$s 알레르기가 있습니까?</string>
     <string name="AllergyQuestion">다음 질문에 대답해주세요. </string>
