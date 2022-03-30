@@ -32,15 +32,17 @@ class TutorialAllergyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        files.add(Pair("yes_or_no.json", "방법 1"))
-        files.add(Pair("voice_icon.json", "방법 2"))
-        files.add(Pair("hand_click_gesture.json", "방법 3"))
 
         initView()
         initEvent()
     }
 
     private fun initView() {
+        resources.getStringArray(R.array.allergy_tutorials).forEach {
+            val item = it.split(" | ")
+            files.add(Pair(item[0], item[1]))
+        }
+
         tutoAllergyPagerAdapter = TutoAllergyPagerAdapter(files)
         binding.vpagerAllergyTutorial.apply {
             adapter     = tutoAllergyPagerAdapter
