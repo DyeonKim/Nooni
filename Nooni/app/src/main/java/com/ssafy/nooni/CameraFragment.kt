@@ -34,6 +34,7 @@ import kotlin.concurrent.timer
 import com.ssafy.nooni.repository.PrdInfoRepository
 import com.ssafy.nooni.util.*
 import com.ssafy.nooni.viewmodel.PrdInfoViewModel
+import java.net.URLEncoder
 
 
 private const val TAG = "CameraFragment"
@@ -88,17 +89,6 @@ class CameraFragment : Fragment() {
         init()
         initSensor()
         initProductData()
-
-        // 아래와 같이 url에서 음성파일 실행할 수 있음
-        // TODO: 음성파일 이름 규칙을 만들어야 url 접근이 용이
-        // 현재는 https://storage.googleapis.com/nooni-a587a.appspot.com/results/vocgan_{ }.wav 인데
-        // 괄호안의 형태를 이미지 클래스 분류 output에 맞춰야 할 것같음
-
-//        val url = URLEncoder.encode(
-//            "https://storage.googleapis.com/nooni-a587a.appspot.com/results/vocgan_콘초 입니다 .wav",
-//            "UTF-8"
-//        )
-//        mediaUtil.start(url)
     }
 
     private fun init() {
@@ -227,13 +217,10 @@ class CameraFragment : Fragment() {
                 requireActivity().runOnUiThread {
                     val image = imageDetectUtil.getEvaluatedImage()
                     if (image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
-                        val string = "제품은 ${
-                            String.format(
-                                "%s",
-                                productUtil.getProductData(image.id).name
-                            )
-                        }입니다."
-                        mainActivity.ttsSpeak(string)
+                        var productName = "vocgan_${productUtil.getProductData(image.id).name}.wav"
+                        var url = "${resources.getString(R.string.firebase_storage_url_head)}results/${productName}"
+                        url = URLEncoder.encode(url, "UTF-8")
+                        mediaUtil.start(url)
                     } else {
                         mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
                         kakaoUtil.sendKakaoLink(image.image!!)
@@ -357,6 +344,12 @@ class CameraFragment : Fragment() {
         behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         initData()
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        mediaUtil.stop()
     }
 
     fun getDirection(x1: Float, y1: Float, x2: Float, y2: Float): Direction? {
