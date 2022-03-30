@@ -76,8 +76,9 @@ class RegisterAllergyActivity : AppCompatActivity() {
 
     private fun initViewModel() {
         sttViewModel.stt.observe(this) {
-            if (ready == false)
+            if (ready == false) {
                 return@observe
+            }
 
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
             val resultString = sttViewModel.stt.value!!

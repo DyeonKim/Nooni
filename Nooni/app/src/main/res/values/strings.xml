@@ -89,11 +89,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string-array name="allergy_tutorials">
-        <item>voice.json | 튜토리얼 시작</item>
+        <item>eyes.json | 튜토리얼 시작</item>
         <item>yes_or_no.json | OX 버튼으로 답하기</item>
         <item>voice_icon.json | 음성으로 답하기</item>
         <item>hand_click_gesture.json | 제스쳐로 답하기\n한번 터치하면 \'예\'\n두번 터치하면 \'아니오\'</item>
-        <item>voice.json | 튜토리얼 끝</item>
+        <item>eyes.json | 튜토리얼 끝</item>
     </string-array>
 
     <string-array name="allergy_tutorial_voices">
