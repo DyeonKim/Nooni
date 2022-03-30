@@ -18,11 +18,13 @@ class ImageDetectUtil(val context: Context) {
     val IMAGE_SIZE = 224
     val GIVEN_TIME = 3.0 // 주어진 시간
     val CHECK_CNT = 3 // GIVEN_TIME 동안 검사할 횟수
-    val SUCCESS_RATE = 80 // ex) 성공률 80% = 80
+    val SUCCESS_RATE = 98 // ex) 성공률 80% = 80
 
     var pq = PriorityQueue<DetectedImage>()
 
     fun classifyImage(image: Bitmap) {
+        pq.clear()
+
         try {
             var model: Model = Model.newInstance(context)
 
