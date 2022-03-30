@@ -52,11 +52,19 @@ class TutorialAllergyFragment : Fragment() {
 
     private fun initEvent() {
         binding.btnPrev.setOnClickListener {
+            val currentItem = binding.vpagerAllergyTutorial.currentItem
 
+            if (currentItem > 0) {
+                binding.vpagerAllergyTutorial.currentItem = currentItem - 1
+            }
         }
 
         binding.btnNext.setOnClickListener {
+            val currentItem = binding.vpagerAllergyTutorial.currentItem
 
+            if (currentItem < files.size - 1) {
+                binding.vpagerAllergyTutorial.currentItem = currentItem + 1
+            }
         }
 
         registerAllergyAct.onAnswerListener = object : RegisterAllergyActivity.OnAnswerListener {
