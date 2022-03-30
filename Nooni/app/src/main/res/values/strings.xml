@@ -89,5 +89,36 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string-array name="allergy_tutorials">
+        <item>voice.json | 튜토리얼 시작</item>
+        <item>yes_or_no.json | OX 버튼으로 답하기</item>
+        <item>voice_icon.json | 음성으로 답하기</item>
+        <item>hand_click_gesture.json | 제스쳐로 답하기\n한번 터치하면 \'예\'\n두번 터치하면 \'아니오\'</item>
+        <item>voice.json | 튜토리얼 끝</item>
+    </string-array>
+
+    <string-array name="allergy_tutorial_voices">
+        <item>
+            알레르기 등록 튜토리얼입니다.
+            총 5개의 화면으로 구성되어 있고\n 스와이프와 버튼을 통해 화면을 이동할 수 있습니다.
+            튜토리얼이 끝나면 질문이 나옵니다. 질문에 예 아니오로 답해주세요.
+        </item>
+        <item>
+            질문에 답하는 방법은 3가지 입니다.
+            첫째, OX버튼으로 답할 수 있습니다.
+            O를 누르면 예. X를 누르면 아니오.로 답변할 수 있습니다.
+        </item>
+        <item>
+            둘째, 음성으로 답할 수 있습니다.
+        </item>
+        <item>
+            셋째, 제스쳐로 답할 수 있습니다.
+            화면을 한번 터치하면 예. 두번 터치하면 아니오.로 답변할 수 있습니다.
+        </item>
+        <item>
+            튜토리얼이 모두 끝났습니다.
+            알레르기 등록을 시작하시겠습니까?
+        </item>
+    </string-array>
 
 </resources>
