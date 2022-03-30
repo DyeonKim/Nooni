@@ -28,7 +28,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/indicator0_iv_tutorial"
+                android:id="@+id/indicator_iv_tutorial"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
                 android:layout_marginEnd="10dp"
@@ -36,6 +36,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/shape_circle_white" />
+
+            <ImageView
+                android:id="@+id/indicator0_iv_tutorial"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginHorizontal="10dp"
+                app:layout_constraintBottom_toBottomOf="@+id/indicator_iv_tutorial"
+                app:layout_constraintStart_toEndOf="@+id/indicator_iv_tutorial"
+                app:layout_constraintTop_toTopOf="@+id/indicator_iv_tutorial"
+                app:srcCompat="@drawable/shape_circle_gray" />
 
             <ImageView
                 android:id="@+id/indicator1_iv_tutorial"

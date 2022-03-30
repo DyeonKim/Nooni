@@ -5,25 +5,23 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.Toast
-import com.ssafy.nooni.MainActivity
 import com.ssafy.nooni.R
 import com.ssafy.nooni.databinding.FragmentTutorialOneBinding
+import com.ssafy.nooni.databinding.FragmentTutorialZeroBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.concurrent.timer
 
-private const val TAG = "TutorialOneFragment"
-class TutorialOneFragment : Fragment() {
-    private lateinit var binding: FragmentTutorialOneBinding
+
+class TutorialZeroFragment : Fragment() {
+    private lateinit var binding: FragmentTutorialZeroBinding
     private lateinit var tutorialActivity: TutorialActivity
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentTutorialOneBinding.inflate(inflater, container, false)
+        binding = FragmentTutorialZeroBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -34,7 +32,12 @@ class TutorialOneFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial0))
+        GlobalScope.launch {
+            delay(500)
+            tutorialActivity.tts!!.setSpeechRate(2f)
+            tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial))
+        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,7 +89,7 @@ class TutorialOneFragment : Fragment() {
         }
 
         override fun onDoubleTap(p0: MotionEvent?): Boolean {
-            tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial0))
+            tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial))
             return true
         }
 
@@ -94,5 +97,6 @@ class TutorialOneFragment : Fragment() {
             return false
         }
     }
+
 
 }

@@ -32,13 +32,11 @@ class TutorialActivity : AppCompatActivity() {
             apply()
         }
 
-
-
         initTTS()
 
         binding.btn.setOnClickListener {
             var current = binding.viewPager.currentItem
-            if(current  == 3) {
+            if(current  == 4) {
                 startActivity(Intent(applicationContext, MainActivity::class.java))
                 finish()
 
@@ -66,7 +64,8 @@ class TutorialActivity : AppCompatActivity() {
 
     fun initViewPager() {
         val pagerAdapter = TutorialViewPagerAdapter(this)
-        // 4개의 Fragment Add
+        // 5개의 Fragment Add
+        pagerAdapter.addFragment(TutorialZeroFragment())
         pagerAdapter.addFragment(TutorialOneFragment())
         pagerAdapter.addFragment(TutorialTwoFragment())
         pagerAdapter.addFragment(TutorialThreeFragment())
@@ -77,27 +76,30 @@ class TutorialActivity : AppCompatActivity() {
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-
+                binding.indicatorIvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
                 binding.indicator3IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_gray))
 
                 when(position) {
-
                     0 -> {
-                        binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.indicatorIvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
                         binding.btnTv.text = "다음"
                     }
                     1 -> {
-                        binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.indicator0IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
                         binding.btnTv.text = "다음"
                     }
                     2 -> {
-                        binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.indicator1IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
                         binding.btnTv.text = "다음"
                     }
                     3 -> {
+                        binding.indicator2IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
+                        binding.btnTv.text = "다음"
+                    }
+                    4 -> {
                         binding.indicator3IvTutorial.setImageDrawable(getDrawable(R.drawable.shape_circle_white))
                         binding.btnTv.text = "시작하기"
                     }
@@ -111,7 +113,7 @@ class TutorialActivity : AppCompatActivity() {
                 positionOffsetPixels: Int
             ) {
                 super.onPageScrolled(position, positionOffset, positionOffsetPixels)
-                if(position == 3 && positionOffset == 0.0f && !isLastPageScroll) {
+                if(position == 4 && positionOffset == 0.0f && !isLastPageScroll) {
                     if(counterPageScroll != 0) {
                         isLastPageScroll = true
                         startActivity(Intent(applicationContext, MainActivity::class.java))
