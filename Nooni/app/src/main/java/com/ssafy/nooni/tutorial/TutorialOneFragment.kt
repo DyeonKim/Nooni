@@ -36,6 +36,7 @@ class TutorialOneFragment : Fragment() {
         super.onResume()
         GlobalScope.launch {
             delay(500)
+            tutorialActivity.tts!!.setSpeechRate(2f)
             tutorialActivity.ttsSpeak(resources.getString(R.string.tutorial0))
         }
 
