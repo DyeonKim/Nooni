@@ -40,7 +40,7 @@ class KakaoUtil(val context: Context) {
         imgFileName = "IMAGE_$timeStamp"
         storageRef.child("images")?.child(imgFileName).putBytes(byteArray).addOnCompleteListener {
             Toast.makeText(context, "이미지를 성공적으로 가져왔습니다", Toast.LENGTH_SHORT).show()
-            sendMessage("테스트입니다")
+            sendMessage("어떤 물건인지 알려주세요")
         }.addOnFailureListener {
             Toast.makeText(context, "이미지를 가져오지 못했습니다", Toast.LENGTH_SHORT).show()
         }
@@ -49,7 +49,7 @@ class KakaoUtil(val context: Context) {
     private fun sendMessage(content: String) {
         val defaultFeed = FeedTemplate(
             content = Content(
-                title = "Test Title",
+                title = "Nooni",
                 description = content,
                 imageUrl = getImageUrl(),
                 link = Link(
@@ -74,6 +74,6 @@ class KakaoUtil(val context: Context) {
     }
 
     private fun getImageUrl(): String {
-        return "${context.resources.getString(R.string.firebase_storage_url_head)}${imgFileName}"
+        return "${context.resources.getString(R.string.firebase_storage_url_head)}images/${imgFileName}"
     }
 }

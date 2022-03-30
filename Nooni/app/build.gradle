@@ -125,4 +125,7 @@ dependencies {
 
     //androidx preference
     implementation "androidx.preference:preference-ktx:1.1.0"
+
+    //dotsindicator
+    implementation 'com.tbuonomo:dotsindicator:4.2'
 }
