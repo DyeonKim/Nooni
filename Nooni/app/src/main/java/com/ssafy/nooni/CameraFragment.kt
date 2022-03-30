@@ -221,11 +221,11 @@ class CameraFragment : Fragment() {
                         var url = "${resources.getString(R.string.firebase_storage_url_head)}results/${productName}"
                         url = URLEncoder.encode(url, "UTF-8")
                         mediaUtil.start(url)
+                        setProductData(image.id)
                     } else {
                         mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
                         kakaoUtil.sendKakaoLink(image.image!!)
                     }
-                    setProductData(image.id)
                 }
                 this.cancel()
             }
