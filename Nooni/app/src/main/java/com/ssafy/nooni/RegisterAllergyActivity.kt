@@ -15,6 +15,11 @@ import com.ssafy.nooni.viewmodel.SttViewModel
 import com.ssafy.nooni.databinding.ActivityRegisterAllergyBinding
 import com.ssafy.nooni.util.STTUtil
 import java.util.*
+import android.content.SharedPreferences
+
+import android.app.Activity
+import androidx.fragment.app.Fragment
+
 
 private const val TAG = "RegisterAllergy"
 
@@ -36,11 +41,13 @@ class RegisterAllergyActivity : AppCompatActivity() {
         initViewModel()
         initSTT()
 
+        val fragment = isFirstRun()
+
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fc_view)
 
         if (currentFragment == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fc_view, TutorialAllergyFragment())
+                .replace(R.id.fc_view, fragment)
                 .commit()
         }
     }
@@ -88,6 +95,26 @@ class RegisterAllergyActivity : AppCompatActivity() {
                     return@observe
                 }
             }
+        }
+    }
+
+    private fun isFirstRun(): Fragment {
+        val pref = getSharedPreferences("firstAllergyRegister", MODE_PRIVATE)
+        val first = pref.getBoolean("isFirst", false)
+
+        return if (first == false) {
+            Log.d("Is first Time?", "first")
+            val editor = pref.edit()
+            editor.putBoolean("isFirst", true)
+            editor.commit()
+
+            ready = false
+            TutorialAllergyFragment()
+        } else {
+            Log.d("Is first Time?", "not first")
+
+            ready = true
+            RegisterAllergyFragment()
         }
     }
 
