@@ -5,6 +5,43 @@
     <string name="shared_file">USER_INFO</string>
     <string name="firebase_storage_url_head">https://storage.googleapis.com/nooni-a587a.appspot.com/images/</string>
 
+    <string name="NooniReady">네 말씀해주세요</string>
+
+    <string name="NooniAgain">다시한번 말씀해주세요</string>
+
+    <string name="GoBack">이전화면으로 돌아갑니다. </string>
+
+    <string name="NooniClose">누니를 종료합니다. </string>
+
+    <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
+    <string name="CameraFragBeforeDetection">인식된 상품이 없습니다</string>
+
+    <string name="BSBeforeDetection">인식된 상품이 없습니다.\n인식할 상품을 촬영해주세요.</string>
+
+    <string name="AllergyNotice">%1$s 알레르기가 있습니까?</string>
+
+    <string name="AllergyQuestion">다음 질문에 대답해주세요. </string>
+    <string name="AllergyFinish">알레르기 정보 등록이 완료되었습니다. 이전화면으로돌아갑니다 </string>
+    <string name="AllergyFrag">알레르기 정보 화면입니다. </string>
+    <string name="NoAllergy">등록된 알레르기가 없습니다. </string>
+    <string name="AllergyChange">수정하시려면 화면을 두 번 누르세요. </string>
+
+    <string name="ContactCall"> 님에게 전화를 거시겠습니까?</string>
+    <string name="ContactRemoveAsk"> 님의 연락처를 삭제하시겠습니까?</string>
+    <string name="ContactFrag">연락처 화면입니다. 연락처를 등록하려면 화면 맨아래 버튼을 눌러주세요.</string>
+
+    <string name="ContactAddFinish">연락처 등록이 완료되었습니다.</string>
+    <string name="ContactAlreadyAdd">이미 등록되어있는 연락처 입니다.</string>
+    <string name="ContactRemove">연락처가 삭제되었습니다.</string>
+    <string name="tutorial">안녕하세요. 누니입니다. 누니는 시각장애인용 편의점 제품 인식 앱 입니다.
+        이곳은 누니의 사용방법에 대해서 설명하는 튜토리얼 화면입니다. 총 4개의 화면으로 구성되어 있고 다음 설명을 들으려면 화면을 오른쪽으로 스와이프 해주세요. 다시 들으시려면 화면을 두번 터치해주세요.</string>
+    <string name="tutorial0">제품 인식 설명입니다. 제품 인식을 하기 위해서는 먼저 제품은 손에 들고 카메라는 제품을 향하게 해주세요.</string>
+    <string name="tutorial1">촬영하려면 화면을 두 번 연속으로 터치해주세요.</string>
+    <string name="tutorial2">촬영된 제품이 인식되면 음성으로 인식된 제품을 안내합니다. 화면을 아래에서 위로 밀어 올리면
+    제품의 가격, 알레르기 유발 성분도 음성으로 안내합니다.</string>
+    <string name="tutorial3">연락처 등록을 통해 지인에게 전화 도움 요청을 할 수 있습니다. 이제 누니 앱의 설명은 끝입니다.
+     누니 앱의 기능을 사용하려면 화면을 오른쪽으로 스와이프 해주세요.</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string-array name="CallNooni">
         <item>누니야</item>
         <item>눈이야</item>
@@ -22,19 +59,13 @@
         <item>카메라</item>
         <item>홈</item>
     </string-array>
-
     <string-array name="contact">
         <item>연락처</item>
     </string-array>
-
     <string-array name="allergy">
         <item>알레르기</item>
         <item>알러지</item>
     </string-array>
-
-    <string name="NooniReady">네 말씀해주세요</string>
-    <string name="NooniAgain">다시한번 말씀해주세요</string>
-
     <string-array name="yes">
         <item>네</item>
         <item>예</item>
@@ -44,7 +75,7 @@
         <item>있음</item>
         <item>예스</item>
     </string-array>
-
+    <!-- TODO: Remove or change this placeholder text -->
     <string-array name="no">
         <item>아니요</item>
         <item>안이요</item>
@@ -56,38 +87,6 @@
         <item>노</item>
         <item>없어요</item>
     </string-array>
-
-    <string name="GoBack">이전화면으로 돌아갑니다. </string>
-    <string name="NooniClose">누니를 종료합니다. </string>
-    <string name="CameraFrag">상품 인식 화면입니다. 촬영하려면 화면을 두 번 눌러주세요</string>
-    <string name="CameraFragBeforeDetection">인식된 상품이 없습니다</string>
-    <string name="BSBeforeDetection">인식된 상품이 없습니다.\n인식할 상품을 촬영해주세요.</string>
-
-    <string name="AllergyNotice">%1$s 알레르기가 있습니까?</string>
-    <string name="AllergyQuestion">다음 질문에 대답해주세요. </string>
-    <string name="AllergyFinish">알레르기 정보 등록이 완료되었습니다. 이전화면으로돌아갑니다 </string>
-
-    <string name="AllergyFrag">알레르기 정보 화면입니다. </string>
-    <string name="NoAllergy">등록된 알레르기가 없습니다. </string>
-    <string name="AllergyChange">수정하시려면 화면을 두 번 누르세요. </string>
-    <string name="ContactCall"> 님에게 전화를 거시겠습니까?</string>
-    <string name="ContactRemoveAsk"> 님의 연락처를 삭제하시겠습니까?</string>
-    <string name="ContactFrag">연락처 화면입니다. 연락처를 등록하려면 화면 맨아래 버튼을 눌러주세요.</string>
-    <string name="ContactAddFinish">연락처 등록이 완료되었습니다.</string>
-    <string name="ContactAlreadyAdd">이미 등록되어있는 연락처 입니다.</string>
-    <string name="ContactRemove">연락처가 삭제되었습니다.</string>
-
-    <string name="tutorial0">안녕하세요. 누니입니다. 누니는 시각장애인용 편의점 제품 인식 앱 입니다.
-        이곳은 누니의 사용방법에 대해서 설명하는 튜토리얼 화면입니다. 총 4개의 화면으로 구성되어 있고 다음 설명을 들으려면 화면을 오른쪽으로 스와이프 해주세요.
-        제품 인식 설명입니다. 제품 인식을 하기 위해서는 먼저 제품은 손에 들고 카메라는 제품을 향하게 해주세요.
-        다시 들으시려면 화면을 두번 터치해주세요.</string>
-    <string name="tutorial1">촬영하려면 화면을 두 번 연속으로 터치해주세요.</string>
-    <string name="tutorial2">촬영된 제품이 인식되면 음성으로 인식된 제품을 안내합니다. 화면을 아래에서 위로 밀어 올리면
-    제품의 가격, 알레르기 유발 성분도 음성으로 안내합니다.</string>
-    <string name="tutorial3">연락처 등록을 통해 지인에게 전화 도움 요청을 할 수 있습니다. 이제 누니 앱의 설명은 끝입니다.
-     누니 앱의 기능을 사용하려면 화면을 오른쪽으로 스와이프 해주세요.</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
