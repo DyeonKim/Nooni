@@ -25,8 +25,8 @@ class RegisterAllergyFragment : Fragment() {
     private lateinit var list: Array<String>
     private val allergyList = ArrayList<String>()
     private val sttViewModel: SttViewModel by activityViewModels()
-    var cnt = 0
-    private var nooniCnt = 0
+    private var cnt = 0
+    private var noonicnt = true
 
 
     override fun onAttach(context: Context) {
@@ -78,25 +78,14 @@ class RegisterAllergyFragment : Fragment() {
 
     private fun initViewModel() {
         sttViewModel.stt.observe(viewLifecycleOwner) {
-            if (nooniCnt == 0) {
+            if (noonicnt) {
                 Log.d("tst6", "onCreate: ")
-                if (cnt == 0) {
-                    registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyQuestion))
-                } else {
-                    registerAllergyAct.ttsSpeak(resources.getString(R.string.NooniAgain))
-                }
-                nooniCnt++
+                registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyQuestion))
             } else {
-                sttViewModel.setNooni(false)
-                nooniCnt = 0
+                registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
             }
+            noonicnt=!noonicnt
             return@observe
-        }
-
-        sttViewModel.nooni.observe(viewLifecycleOwner) {
-            if (sttViewModel.nooni.value == false) {
-                registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
-            }
         }
     }
 
@@ -104,7 +93,7 @@ class RegisterAllergyFragment : Fragment() {
         if (++cnt >= list.size) save()
         else {
             binding.tvAllergyAType.text = list[cnt]
-            registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyNotice,list[cnt]))
+            registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
         }
     }
 

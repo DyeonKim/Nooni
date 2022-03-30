@@ -8,6 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
 import com.ssafy.nooni.databinding.FragmentTutorialAllergyBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class TutorialAllergyFragment : Fragment() {
@@ -15,6 +18,7 @@ class TutorialAllergyFragment : Fragment() {
     private lateinit var registerAllergyAct: RegisterAllergyActivity
     private lateinit var tutoAllergyPagerAdapter: TutoAllergyPagerAdapter
     private val files = ArrayList<Pair<String, String>>()
+    private val strVoice = ArrayList<String>()
 
 
     override fun onAttach(context: Context) {
@@ -42,12 +46,15 @@ class TutorialAllergyFragment : Fragment() {
             val item = it.split(" | ")
             files.add(Pair(item[0], item[1]))
         }
+        resources.getStringArray(R.array.allergy_tutorial_voices).forEach {
+            strVoice.add(it)
+        }
 
         tutoAllergyPagerAdapter = TutoAllergyPagerAdapter(files)
         binding.vpagerAllergyTutorial.apply {
             adapter     = tutoAllergyPagerAdapter
             orientation = ViewPager2.ORIENTATION_HORIZONTAL
-        }
+        }.registerOnPageChangeCallback(pageChangeCallback)
 
         binding.dotsIndicator.setViewPager2(binding.vpagerAllergyTutorial)
     }
@@ -58,6 +65,8 @@ class TutorialAllergyFragment : Fragment() {
 
             if (currentItem > 0) {
                 binding.vpagerAllergyTutorial.currentItem = currentItem - 1
+            } else {
+                registerAllergyAct.finish()
             }
         }
 
@@ -66,11 +75,16 @@ class TutorialAllergyFragment : Fragment() {
 
             if (currentItem < files.size - 1) {
                 binding.vpagerAllergyTutorial.currentItem = currentItem + 1
+            } else {
+                registerAllergyAct.startRegisterAllergy()
             }
         }
 
         registerAllergyAct.onAnswerListener = object : RegisterAllergyActivity.OnAnswerListener {
             override fun setAnswer(answer: Boolean) {
+                if (registerAllergyAct.ready == false)
+                    return
+
                 when(answer) {
                     true -> {
                         registerAllergyAct.startRegisterAllergy()
@@ -82,6 +96,20 @@ class TutorialAllergyFragment : Fragment() {
             }
         }
 
+    }
+
+    private fun speak(index: Int) {
+        CoroutineScope(Dispatchers.Main).launch {
+            registerAllergyAct.ttsSpeak(strVoice[index])
+        }
+    }
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            super.onPageSelected(position)
+            registerAllergyAct.ready = (position == files.size - 1)
+            speak(position)
+        }
     }
 
 }

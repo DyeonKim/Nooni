@@ -23,6 +23,7 @@ class RegisterAllergyActivity : AppCompatActivity() {
     private lateinit var mDetector: GestureDetectorCompat
     private val sttViewModel: SttViewModel by viewModels()
     lateinit var onAnswerListener: OnAnswerListener
+    var ready = false
     var tts2: TextToSpeech? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,17 +60,18 @@ class RegisterAllergyActivity : AppCompatActivity() {
         Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
         //처음에 시작할때 tts초기화랑 뭔가 타이밍이 안맞는것 같음 어쩔땐 되고 어쩔땐 안되서 억지로 딜레이늘림
         tts2?.setSpeechRate(2f)
+
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
-            sttViewModel.setNooni(true)
             sttViewModel.setStt(resources.getString(R.string.init))
         }, 1000)
-        sttViewModel.setStt("")
-        sttViewModel.setStt(resources.getString(R.string.init))
     }
 
     private fun initViewModel() {
         sttViewModel.stt.observe(this) {
+            if (ready == false)
+                return@observe
+
             Log.d("tst6", "onCreate: " + sttViewModel.stt.value)
             val resultString = sttViewModel.stt.value!!
             resources.getStringArray(R.array.yes).forEach {
