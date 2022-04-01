@@ -99,7 +99,6 @@ class CameraFragment : Fragment() {
         }
 
         mainActivity.onDoubleClick(binding.root) {
-            // TODO: tts로 안내하기
             Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
             mainActivity.ttsSpeak("촬영중입니다.")
             classifyProduct()
@@ -216,15 +215,17 @@ class CameraFragment : Fragment() {
             if (time < 0) {
                 requireActivity().runOnUiThread {
                     val image = imageDetectUtil.getEvaluatedImage()
-                    if (image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                    if (image != null && image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
                         var productName = "vocgan_${productUtil.getProductData(image.id).name}.wav"
                         var url = "${resources.getString(R.string.firebase_storage_url_head)}results/${productName}"
                         url = URLEncoder.encode(url, "UTF-8")
                         mediaUtil.start(url)
                         setProductData(image.id)
                     } else {
-                        mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
-                        kakaoUtil.sendKakaoLink(image.image!!)
+                        if(image != null) {
+                            mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                            kakaoUtil.sendKakaoLink(image.image!!)
+                        }
                     }
                 }
                 this.cancel()
@@ -334,7 +335,7 @@ class CameraFragment : Fragment() {
         val string = if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
             resources.getString(R.string.BSBeforeDetection)
         } else {
-            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy. 다시 들으시려면 핸드폰을 흔들어주세요."
         }
         mainActivity.ttsSpeak(string)
     }

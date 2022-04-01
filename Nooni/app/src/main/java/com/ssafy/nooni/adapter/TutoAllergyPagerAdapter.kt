@@ -1,4 +1,4 @@
-package com.ssafy.nooni
+package com.ssafy.nooni.adapter
 
 
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
+import com.ssafy.nooni.R
 
 class TutoAllergyPagerAdapter(private val files: ArrayList<Pair<String, String>>)
     : RecyclerView.Adapter<TutoAllergyPagerAdapter.PagerViewHolder>() {
@@ -20,7 +21,7 @@ class TutoAllergyPagerAdapter(private val files: ArrayList<Pair<String, String>>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int ) = PagerViewHolder((parent))
 
-    override fun onBindViewHolder(holder: TutoAllergyPagerAdapter.PagerViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PagerViewHolder, position: Int) {
         holder.lottie.apply {
             setAnimation(files[position].first)
             repeatCount = LottieDrawable.INFINITE

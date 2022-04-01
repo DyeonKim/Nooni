@@ -78,10 +78,7 @@ class RegisterAllergyFragment : Fragment() {
 
     private fun initViewModel() {
         sttViewModel.stt.observe(viewLifecycleOwner) {
-            if (noonicnt) {
-                Log.d("tst6", "onCreate: ")
-                registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyQuestion))
-            } else {
+            if (!noonicnt) {
                 registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyNotice, list[cnt]))
             }
             noonicnt=!noonicnt
@@ -100,7 +97,7 @@ class RegisterAllergyFragment : Fragment() {
     private fun save() {
         sharePrefArrayListUtil.setAllergies(allergyList)
         Toast.makeText(requireContext(), resources.getString(R.string.AllergyFinish), Toast.LENGTH_SHORT).show()
-        registerAllergyAct.tts2?.speak(resources.getString(R.string.AllergyFinish), TextToSpeech.QUEUE_FLUSH, null)
+        registerAllergyAct.ttsSpeak(resources.getString(R.string.AllergyFinish))
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(Runnable {
