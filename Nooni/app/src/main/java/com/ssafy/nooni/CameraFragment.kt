@@ -334,7 +334,7 @@ class CameraFragment : Fragment() {
         val string = if (binding.llCameraFBeforeD.visibility == View.VISIBLE) {
             resources.getString(R.string.BSBeforeDetection)
         } else {
-            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy"
+            "$name, 가격 $price, 알레르기 유발 성분 $allergen,  $strIsAllergy. 다시 들으시려면 핸드폰을 흔들어주세요."
         }
         mainActivity.ttsSpeak(string)
     }
