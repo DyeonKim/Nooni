@@ -99,7 +99,6 @@ class CameraFragment : Fragment() {
         }
 
         mainActivity.onDoubleClick(binding.root) {
-            // TODO: tts로 안내하기
             Toast.makeText(context, "인식 중입니다.", Toast.LENGTH_SHORT).show()
             mainActivity.ttsSpeak("촬영중입니다.")
             classifyProduct()
