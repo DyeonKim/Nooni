@@ -70,7 +70,11 @@ class ImageDetectUtil(val context: Context) {
         }
     }
 
-    fun getEvaluatedImage(): DetectedImage {
-        return pq.poll()
+    fun getEvaluatedImage(): DetectedImage? {
+        return if(!pq.isEmpty()){
+            pq.poll()
+        } else {
+            null
+        }
     }
 }

@@ -215,15 +215,17 @@ class CameraFragment : Fragment() {
             if (time < 0) {
                 requireActivity().runOnUiThread {
                     val image = imageDetectUtil.getEvaluatedImage()
-                    if (image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
+                    if (image != null && image.confidence * 100 >= imageDetectUtil.SUCCESS_RATE) {
                         var productName = "vocgan_${productUtil.getProductData(image.id).name}.wav"
                         var url = "${resources.getString(R.string.firebase_storage_url_head)}results/${productName}"
                         url = URLEncoder.encode(url, "UTF-8")
                         mediaUtil.start(url)
                         setProductData(image.id)
                     } else {
-                        mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
-                        kakaoUtil.sendKakaoLink(image.image!!)
+                        if(image != null) {
+                            mainActivity.ttsSpeak("인식률이 낮아 카카오톡 공유하기를 실행합니다.")
+                            kakaoUtil.sendKakaoLink(image.image!!)
+                        }
                     }
                 }
                 this.cancel()
