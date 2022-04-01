@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
+import com.ssafy.nooni.adapter.TutoAllergyPagerAdapter
 import com.ssafy.nooni.databinding.FragmentTutorialAllergyBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
