@@ -9,8 +9,6 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,11 +35,11 @@ public class WebController {
         File file = File.createTempFile("new_nooni_v1.0.0", ".apk");
         // 클라이언트에서 아래의 이름으로 파일이 받아진다.
         String newFileName = "n_nooni_v1.0.0.apk";
-        try {
-        	FileUtils.copyInputStreamToFile(inputStream, file);
-        } finally {
-        	IOUtils.closeQuietly(inputStream);
-        }
+//        try {
+//        	FileUtils.copyInputStreamToFile(inputStream, file);
+//        } finally {
+//        	IOUtils.closeQuietly(inputStream);
+//        }
         
         try (
                 FileInputStream fis = new FileInputStream(file);
