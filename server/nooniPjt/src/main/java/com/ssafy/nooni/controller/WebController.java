@@ -28,7 +28,6 @@ public class WebController {
     @GetMapping(value = "/download")
     public void downloadFile(HttpServletResponse response) throws Exception{
 
-        // 프로젝트 폴더의 temp.jpg 파일 로드
         String fileName = "nooni_v1.0.0.apk";
 //        Resource resource = resourceLoader.getResource("classpath:/"+ fileName);	
 //		File file = resource.getFile();
