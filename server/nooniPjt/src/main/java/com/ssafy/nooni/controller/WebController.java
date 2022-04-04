@@ -9,8 +9,9 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,16 +31,17 @@ public class WebController {
 //        Resource resource = resourceLoader.getResource("classpath:/"+ fileName);	
 //		File file = resource.getFile();
         ClassPathResource classPathResource = new ClassPathResource(fileName);
-       // InputStream inputStream = classPathResource.getInputStream();
-        File file = classPathResource.getFile();
-        //File file = File.createTempFile("nooni_v1.0.0", ".apk");
+        InputStream inputStream = classPathResource.getInputStream();
+        //File file = classPathResource.getFile();
+        
+        File file = File.createTempFile("new_nooni_v1.0.0", ".apk");
         // 클라이언트에서 아래의 이름으로 파일이 받아진다.
         String newFileName = "n_nooni_v1.0.0.apk";
-//        try {
-//        	FileUtils.copyInputStreamToFile(inputStream, file);
-//        } finally {
-//        	IOUtils.closeQuietly(inputStream);
-//        }
+        try {
+        	FileUtils.copyInputStreamToFile(inputStream, file);
+        } finally {
+        	IOUtils.closeQuietly(inputStream);
+        }
         
         try (
                 FileInputStream fis = new FileInputStream(file);
