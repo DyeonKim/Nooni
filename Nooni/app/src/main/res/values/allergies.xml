@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="allergy_names">
+        <item>갑각류</item>
+        <item>견과</item>
+        <item>달걀</item>
+        <item>땅콩</item>
+        <item>밀가루</item>
+        <item>생선</item>
+        <item>우유</item>
+        <item>조개</item>
+        <item>콩</item>
+    </string-array>
+
+    <string-array name="allergen_names">
+        <item>게, 새우, 가재</item>
+        <item>호두, 잣</item>
+        <item>계란</item>
+        <item>땅콩</item>
+        <item>밀</item>
+        <item>오징어, 고등어</item>
+        <item>우유</item>
+        <item>굴, 전복, 홍합, 조개</item>
+        <item>대두</item>
+    </string-array>
+</resources>
